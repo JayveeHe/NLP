@@ -4,7 +4,6 @@ package HMM;
  * Created by Jayvee on 2014/11/6.
  */
 public class ForwardVector {
-    //保存的变量
     private HMModel hmModel;
 
     public ForwardVector(HMModel hmModel) {
