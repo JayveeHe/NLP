@@ -1,4 +1,4 @@
-package HMM;
+package HMM.BasicModel;
 
 /**
  * Created by Jayvee on 2014/11/10.

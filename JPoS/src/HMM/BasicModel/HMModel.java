@@ -1,4 +1,4 @@
-package HMM;
+package HMM.BasicModel;
 
 /**
  * Created by Jayvee on 2014/11/6.
@@ -19,7 +19,7 @@ public class HMModel {
     private double[][] AMatrix;
     /**
      * 对于每个隐藏状态，可观测到的各符号的概率。
-     * 即混淆矩阵。
+     * 即混淆矩阵。第一个下标为状态序号，第二个下标为观测序号
      */
     private double[][] BMatrix;
     /**
