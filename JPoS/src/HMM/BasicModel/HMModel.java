@@ -1,5 +1,7 @@
 package HMM.BasicModel;
 
+import sun.plugin.com.AmbientProperty;
+
 /**
  * Created by Jayvee on 2014/11/6.
  */
@@ -22,19 +24,42 @@ public class HMModel {
      * 即混淆矩阵。第一个下标为状态序号，第二个下标为观测序号
      */
     private double[][] BMatrix;
+
+
     /**
      * 初始概率分布向量
      */
     private double[] piVector;
 
+    /**
+     * 指定状态数和符号数，进行随机初始化HMM模型
+     *
+     * @param N 状态数
+     * @param M 符号数
+     */
     public HMModel(int N, int M) {
         this.N = N;
         this.M = M;
         this.AMatrix = new double[N][N];
         this.BMatrix = new double[N][M];
         this.piVector = new double[N];
+        for (int i = 0; i < N; i++) {
+            BasicUtils.randomInitProb(AMatrix[i]);
+            BasicUtils.randomInitProb(BMatrix[i]);
+        }
+        BasicUtils.randomInitProb(piVector);
     }
 
+
+    /**
+     * 根据给定参数进行
+     *
+     * @param N
+     * @param M
+     * @param AMatrix
+     * @param BMatrix
+     * @param piVector
+     */
     public HMModel(int N, int M, double[][] AMatrix, double[][] BMatrix, double[] piVector) {
         this.N = N;
         this.M = M;
@@ -78,4 +103,41 @@ public class HMModel {
         return piVector;
     }
 
+    public void setAMatrix(double[][] AMatrix) {
+        this.AMatrix = AMatrix;
+    }
+
+    public void setBMatrix(double[][] BMatrix) {
+        this.BMatrix = BMatrix;
+    }
+
+    public void setPiVector(double[] piVector) {
+        this.piVector = piVector;
+    }
+
+    @Override
+    public String toString() {
+        String text = "";
+        //打印参数
+        text = text + "N=" + N + "\tM=" + M + "\npiVector:\n";
+        //打印pi向量
+        for (int i = 0; i < piVector.length; i++) {
+            text = text + piVector[i] + "\t";
+        }
+        text = text + "\nA:\n";
+        for (int i = 0; i < AMatrix.length; i++) {
+            for (int j = 0; j < AMatrix[i].length; j++) {
+                text = text + AMatrix[i][j] + "\t";
+            }
+            text = text + "\n";
+        }
+        text = text + "\nB:\n";
+        for (int i = 0; i < BMatrix.length; i++) {
+            for (int j = 0; j < BMatrix[i].length; j++) {
+                text = text + BMatrix[i][j] + "\t";
+            }
+            text = text + "\n";
+        }
+        return text;
+    }
 }

@@ -63,8 +63,8 @@ public class ViterbiDecoder {
         double maxProb = 0;
         int bestFai = 0;
         for (int i = 0; i < hmModel.getN(); i++) {
-            if (maxProb < deltaMatrix[T][i]) {
-                maxProb = deltaMatrix[T][i];
+            if (maxProb < deltaMatrix[T-1][i]) {
+                maxProb = deltaMatrix[T-1][i];
                 bestFai = i;
             }
         }

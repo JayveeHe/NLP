@@ -23,8 +23,7 @@ public class BackwardVector {
         for (int i = 0; i < hmModel.getN(); i++) {
             backwardMatrix[T - 1][i] = 1;
         }
-        int t = 0;
-        for (t = T - 1; t > 0; t--) {
+        for (int t = T -1 ; t > 0; t--) {
             for (int i = 0; i < hmModel.getN(); i++) {
                 backwardMatrix[t - 1][i] = backInduction(i, ObSequence[t], backwardMatrix[t]);
             }
