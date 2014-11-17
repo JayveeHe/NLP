@@ -47,7 +47,7 @@ public class ViterbiDecoder {
         double[] piVector = hmModel.getPiVector();
         double[][] bMatrix = hmModel.getBMatrix();
         for (int i = 0; i < hmModel.getN(); i++) {
-            deltaMatrix[0][i] = piVector[i] * bMatrix[i][ObSequence[1]];
+            deltaMatrix[0][i] = piVector[i] * bMatrix[i][ObSequence[0]];
             faiMatrix[0][i] = 0;
         }
         //recursion
@@ -71,7 +71,7 @@ public class ViterbiDecoder {
         //Path
         int[] path = new int[T];
         path[T - 1] = bestFai;
-        for (int t = T - 2; t >= 0; t--) {
+        for (int t = T - 2; t >=0; t--) {
             path[t] = faiMatrix[t + 1][path[t + 1]];
         }
         return new DecodeResult(path, maxProb);

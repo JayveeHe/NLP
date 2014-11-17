@@ -21,12 +21,11 @@ public class SigmaVector {
         this.hmModel = hmModel;
         this.obSequence = obSequence;
         ForwardVector forwardVector = new ForwardVector(hmModel);
-        forwardMatrix = forwardVector.calForwardMatrix(obSequence);
+        forwardMatrix = forwardVector.calForwardMatrix(obSequence, true);
         BackwardVector backwardVector = new BackwardVector(hmModel);
-        backwardMatrix = backwardVector.calBackwardMatrix(obSequence);
+        backwardMatrix = backwardVector.calBackwardMatrix(obSequence, true);
 
     }
-
 
 
     /**

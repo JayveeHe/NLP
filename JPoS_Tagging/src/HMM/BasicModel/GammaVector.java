@@ -12,9 +12,9 @@ public class GammaVector {
     public GammaVector(int[] ObSequence, HMModel hmModel) {
         this.hmModel = hmModel;
         ForwardVector forwardVector = new ForwardVector(hmModel);
-        this.forwardMatrix = forwardVector.calForwardMatrix(ObSequence);
+        this.forwardMatrix = forwardVector.calForwardMatrix(ObSequence,true);
         BackwardVector backwardVector = new BackwardVector(hmModel);
-        this.backwardMatrix = backwardVector.calBackwardMatrix(ObSequence);
+        this.backwardMatrix = backwardVector.calBackwardMatrix(ObSequence,true);
     }
 
     public double calGammaVector(int t, int i) {
