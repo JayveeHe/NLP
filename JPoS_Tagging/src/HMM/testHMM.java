@@ -32,7 +32,7 @@ public class testHMM {
 //        int[] testSeq = new int[]{0, 1, 0,0,1,0,1};
 //        HMModel hmModel = new HMModel(3, 2, aMatrix, bMatrix, piVector);
 //
-        HMModel hmModel = new HMModel(50, 100000);
+        HMModel hmModel = new HMModel(5, 10);
 //        System.out.println(hmModel);
 
         ForwardVector forwardVector = new ForwardVector(hmModel);
@@ -41,14 +41,21 @@ public class testHMM {
         obSeqProb = forwardVector.calObSeqProb(testSeq, true);
         System.out.println(obSeqProb);
         ViterbiDecoder vd = new ViterbiDecoder(hmModel);
-        ViterbiDecoder.DecodeResult decodeResult = vd.decode(testSeq);
+        ViterbiDecoder.DecodeResult decodeResult = vd.decode(testSeq,true);
         int[] tt = decodeResult.getPath();
         String text = "译码序列：";
         for (int k : tt) {
             text = text + "\t" + k;
         }
         System.out.println(text);
-//        System.exit(0);
+        decodeResult = vd.decode(testSeq,false);
+        tt = decodeResult.getPath();
+        text = "译码序列：";
+        for (int k : tt) {
+            text = text + "\t" + k;
+        }
+        System.out.println(text);
+        System.exit(0);
         ForwardBackwardAlog fba = new ForwardBackwardAlog(hmModel);
         for (int i = 0; i < 20; i++) {
             fba.TrainBySingleObseq(testSeq);
@@ -65,7 +72,7 @@ public class testHMM {
 //            System.out.println(text);
             obSeqProb = forwardVector.calObSeqProb(testSeq, true);
             vd = new ViterbiDecoder(hmModel);
-            decodeResult = vd.decode(testSeq);
+            decodeResult = vd.decode(testSeq,true);
             tt = decodeResult.getPath();
             text = "译码序列：";
             for (int k : tt) {
