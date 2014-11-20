@@ -1,6 +1,5 @@
 package HMM.BasicModel;
 
-import sun.plugin.com.AmbientProperty;
 
 /**
  * Created by Jayvee on 2014/11/6.

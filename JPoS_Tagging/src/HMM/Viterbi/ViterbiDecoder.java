@@ -78,7 +78,7 @@ public class ViterbiDecoder {
         //termination
         double maxProb = 0;
         if (isScaled) {
-            maxProb = -Double.MAX_VALUE;
+            maxProb = Double.NEGATIVE_INFINITY;
         }
         int bestFai = 0;
         for (int i = 0; i < hmModel.getN(); i++) {
@@ -108,11 +108,14 @@ public class ViterbiDecoder {
         double max = 0;
         int fai = 0;
         if (isScaled) {
-            max = -Double.MAX_VALUE;
+            max = Double.NEGATIVE_INFINITY;
         }
         double[][] aMatrix = hmModel.getAMatrix();
         for (int i = 0; i < hmModel.getN(); i++) {
             if (isScaled) {
+                if (formerDeltaVec[i] == Double.NEGATIVE_INFINITY || log_aMatrix[i][j] == Double.NEGATIVE_INFINITY) {
+                    continue;
+                }
                 double temp = formerDeltaVec[i] + log_aMatrix[i][j];
                 if (temp > max) {
                     max = temp;

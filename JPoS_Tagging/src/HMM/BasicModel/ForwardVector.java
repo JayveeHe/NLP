@@ -1,6 +1,5 @@
 package HMM.BasicModel;
 
-import javafx.scene.text.FontWeight;
 
 /**
  * Created by Jayvee on 2014/11/6.
@@ -52,8 +51,8 @@ public class ForwardVector {
                 }
                 prob_log += -Math.log(ct);
             }
-            return Math.pow(Math.E, prob_log);
-//            return prob_log;
+//            return Math.pow(Math.E, prob_log);
+            return prob_log;
         }
 
     }
@@ -144,12 +143,5 @@ public class ForwardVector {
         return 1 / ctemp;
     }
 
-    private void calCtByScaled(double[] scaledForwardVec) {
-        double[] alpha_t = new double[scaledForwardVec.length];
-        for (int i = 0; i < alpha_t.length; i++) {
-
-        }
-
-    }
 
 }

@@ -14,10 +14,17 @@ public class BasicUtils {
         int N = toInitValues.length;
         double probSum = 0;//已分配的概率和
         for (int i = 0; i < N - 1; i++) {
-            toInitValues[i] = Math.random() * (1 - probSum);
-            probSum += toInitValues[i];
+            double temp = Math.random() * (1 - probSum);
+            toInitValues[((int) (Math.random() * N))] += temp;
+//            toInitValues[i] = temp;
+            probSum += temp;
+//            if (probSum == 1) {
+//                break;
+//            }
         }
-        toInitValues[N - 1] = 1 - probSum;
+        toInitValues[((int) (Math.random() * N))] += 1 - probSum;
+//        toInitValues[N-1] = 1 - probSum;
+//        System.out.println(isStochastic(toInitValues));
     }
 
     /**
@@ -29,9 +36,18 @@ public class BasicUtils {
     public static boolean isStochastic(double[] testProbs) {
         double sum = 0;
         for (int i = 0; i < testProbs.length; i++) {
+//            if (testProbs[i] != 0) {
             sum += testProbs[i];
+
+//            }
         }
-        return sum == 1;
+        double temp = sum - 1;
+        if (temp == 0) {
+            return true;
+        } else {
+            temp = Math.log10(temp*temp);
+            return temp < -29;
+        }
     }
 
 }
