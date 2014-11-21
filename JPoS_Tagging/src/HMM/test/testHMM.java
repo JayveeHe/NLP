@@ -1,4 +1,4 @@
-package HMM;
+package HMM.test;
 
 import HMM.BasicModel.ForwardVector;
 import HMM.BasicModel.GammaVector;

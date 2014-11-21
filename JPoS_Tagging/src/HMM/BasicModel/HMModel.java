@@ -1,6 +1,8 @@
 package HMM.BasicModel;
 
 
+import HMM.Utils.RandomUtils;
+
 /**
  * Created by Jayvee on 2014/11/6.
  */
@@ -43,10 +45,10 @@ public class HMModel {
         this.BMatrix = new double[N][M];
         this.piVector = new double[N];
         for (int i = 0; i < N; i++) {
-            BasicUtils.randomInitProb(AMatrix[i]);
-            BasicUtils.randomInitProb(BMatrix[i]);
+            RandomUtils.randomInitProb(AMatrix[i]);
+            RandomUtils.randomInitProb(BMatrix[i]);
         }
-        BasicUtils.randomInitProb(piVector);
+        RandomUtils.randomInitProb(piVector);
     }
 
 

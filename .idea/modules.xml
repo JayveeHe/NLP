@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/JPoS_Tagging/JPoS_Tagging.iml" filepath="$PROJECT_DIR$/JPoS_Tagging/JPoS_Tagging.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../Java/NLP/LearningAlgo/LearningAlgo.iml" filepath="$PROJECT_DIR$/../../Java/NLP/LearningAlgo/LearningAlgo.iml" />
       <module fileurl="file://$PROJECT_DIR$/NLP.iml" filepath="$PROJECT_DIR$/NLP.iml" />
     </modules>
   </component>

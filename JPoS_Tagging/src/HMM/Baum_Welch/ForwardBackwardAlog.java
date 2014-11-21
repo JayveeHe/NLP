@@ -36,7 +36,15 @@ public class ForwardBackwardAlog {
         double b_denominator = 0;//b的分母
         for (int k = 0; k < trainList.size(); k++) {
             int[] individualSeq = trainList.get(k);
-            for (int t = 0; t < individualSeq.length; t++) {
+            int Tk = individualSeq.length;
+            double[][] new_Amatrix = new double[hmModel.getN()][hmModel.getN()];
+            double[][] new_Bmatrix = new double[hmModel.getN()][hmModel.getM()];
+            double[] new_piVector = new double[hmModel.getN()];
+            GammaVector gammaVector = new GammaVector(individualSeq, hmModel);
+            for (int i = 0; i < hmModel.getN(); i++) {
+
+                for (int t = 0; t < Tk - 1; t++) {
+                }
 
             }
         }

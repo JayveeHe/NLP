@@ -1,9 +1,9 @@
-package HMM.BasicModel;
+package HMM.Utils;
 
 /**
  * Created by Jayvee on 2014/11/14.
  */
-public class BasicUtils {
+public class RandomUtils {
     /**
      * 给定一个double数组，为其随机分配符合概率约束的0到1之间的值
      *
