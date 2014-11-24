@@ -1,4 +1,6 @@
-package HMM.Utils;
+package TrainSet.DataStructure;
+
+import org.ansj.domain.Term;
 
 import java.util.*;
 
@@ -21,6 +23,9 @@ public class TrieTree {
         }
     };
 
+    /**
+     * 根据词频度进行降序排序
+     */
     public static Comparator<WordNode> downSortor = new Comparator<WordNode>() {
 
         @Override
@@ -48,6 +53,15 @@ public class TrieTree {
         this.root = new WordNode();
         this.word_list = new ArrayList<WordNode>();
     }
+
+    public TrieTree(List<Term> terms) {
+        this.root = new WordNode();
+        this.word_list = new ArrayList<WordNode>();
+        for (Term term : terms) {
+            addWord(term.getName());
+        }
+    }
+
 
     public WordNode addWord(String word) {
         WordNode wn = root;

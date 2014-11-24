@@ -1,7 +1,14 @@
 package HMM.BasicModel;
 
 
+import HMM.Utils.FileUtils;
 import HMM.Utils.RandomUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.*;
 
 /**
  * Created by Jayvee on 2014/11/6.
@@ -53,7 +60,7 @@ public class HMModel {
 
 
     /**
-     * 根据给定参数进行
+     * 根据给定参数进行模型构造
      *
      * @param N
      * @param M
@@ -68,6 +75,51 @@ public class HMModel {
         this.BMatrix = BMatrix;
         this.piVector = piVector;
     }
+
+    /**
+     * 从文件中读取模型参数，并返回模型实例
+     *
+     * @param filepath 文件的路径
+     */
+    public HMModel(String filepath) {
+        String text = FileUtils.File2str(filepath, "utf-8");
+        JSONTokener tokener = new JSONTokener(text);
+        try {
+            JSONObject root = (JSONObject) tokener.nextValue();
+            this.N = root.getInt("N");
+            this.M = root.getInt("M");
+            this.AMatrix = new double[N][N];
+            this.BMatrix = new double[N][M];
+            this.piVector = new double[N];
+            JSONArray aMatrixArry = root.getJSONArray("AMatrix");
+            JSONArray bMatrixArry = root.getJSONArray("BMatrix");
+            JSONArray piVectorArry = root.getJSONArray("piVector");
+            for (int i = 0; i < N; i++) {
+                JSONArray aMatrixVec = aMatrixArry.getJSONArray(i);
+                JSONArray bMatrixVec = bMatrixArry.getJSONArray(i);
+                if (N > M) {
+                    for (int j = 0; j < N; j++) {
+                        this.AMatrix[i][j] = aMatrixVec.getDouble(j);
+                        if (j < M) {
+                            this.BMatrix[i][j] = bMatrixVec.getDouble(j);
+                        }
+                    }
+                } else {
+                    for (int j = 0; j < M; j++) {
+                        if (j < N) {
+                            this.AMatrix[i][j] = aMatrixVec.getDouble(j);
+                        }
+                        this.BMatrix[i][j] = bMatrixVec.getDouble(j);
+                    }
+                }
+                this.piVector[i] = piVectorArry.getDouble(i);
+            }
+            System.out.println("从文件读取模型成功");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * @return 模型的隐藏状态数
@@ -114,6 +166,64 @@ public class HMModel {
 
     public void setPiVector(double[] piVector) {
         this.piVector = piVector;
+    }
+
+    /**
+     * 将模型参数以JSON格式保存到文件，输出路径为工程文件夹下的data文件夹
+     *
+     * @param filename 文件名
+     */
+    public void saveModel(String filename) {
+        JSONObject root = new JSONObject();
+        try {
+            root.put("N", N);
+            root.put("M", M);
+            JSONArray aMatrixArry = new JSONArray();
+            JSONArray bMatrixArry = new JSONArray();
+            JSONArray piVectorArry = new JSONArray();
+            for (int i = 0; i < N; i++) {
+                JSONArray aMatrixVec = new JSONArray();
+                JSONArray bMatrixVec = new JSONArray();
+                if (N > M) {
+                    for (int j = 0; j < N; j++) {
+                        aMatrixVec.put(AMatrix[i][j]);
+                        if (j < M) {
+                            bMatrixVec.put(BMatrix[i][j]);
+                        }
+                    }
+                } else {
+                    for (int j = 0; j < M; j++) {
+                        if (j < N) {
+                            aMatrixVec.put(AMatrix[i][j]);
+                        }
+                        bMatrixVec.put(BMatrix[i][j]);
+                    }
+                }
+                aMatrixArry.put(aMatrixVec);
+                bMatrixArry.put(bMatrixVec);
+                piVectorArry.put(piVector[i]);
+            }
+            root.put("AMatrix", aMatrixArry);
+            root.put("BMatrix", bMatrixArry);
+            root.put("piVector", piVectorArry);
+
+            //写入文件
+            File dir = new File("");
+            String dirpath = dir.getAbsolutePath();
+            File file = new File(dirpath + "/JPoS_Tagging/data/" + filename);
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(root.toString().getBytes("utf-8"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override

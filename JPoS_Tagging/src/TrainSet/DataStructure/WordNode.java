@@ -1,4 +1,4 @@
-package HMM.Utils;
+package TrainSet.DataStructure;
 
 import java.util.HashMap;
 

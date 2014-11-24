@@ -2,6 +2,7 @@ package HMM.Baum_Welch;
 
 
 import HMM.BasicModel.*;
+import HMM.Utils.RandomUtils;
 
 import java.util.ArrayList;
 
@@ -27,28 +28,92 @@ public class ForwardBackwardAlog {
      *
      * @param trainList 观测序列列表
      */
-    public void TrainByMultiObseq(ArrayList<int[]> trainList) {
+    public void TrainByMultiObseq(ArrayList<int[]> trainList, boolean isSmooth) {
         //TODO 多观测序列的训练
-        double[] pk = calPK(trainList, hmModel);
-        double a_numerator = 0;//新a矩阵的分子
-        double a_denominator = 0;//新a的分母
-        double b_numerator = 0;//b的分子
-        double b_denominator = 0;//b的分母
-        for (int k = 0; k < trainList.size(); k++) {
-            int[] individualSeq = trainList.get(k);
-            int Tk = individualSeq.length;
-            double[][] new_Amatrix = new double[hmModel.getN()][hmModel.getN()];
-            double[][] new_Bmatrix = new double[hmModel.getN()][hmModel.getM()];
-            double[] new_piVector = new double[hmModel.getN()];
-            GammaVector gammaVector = new GammaVector(individualSeq, hmModel);
-            for (int i = 0; i < hmModel.getN(); i++) {
+        double[] prob_O = calPK(trainList, hmModel);
+        double[][] new_Amatrix = new double[hmModel.getN()][hmModel.getN()];
+        double[][] new_Bmatrix = new double[hmModel.getN()][hmModel.getM()];
+        double[] new_piVector = new double[hmModel.getN()];
+        double probSum = 0;
+        for (int q = 0; q < trainList.size(); q++) {
+            probSum += prob_O[q];
+        }
 
-                for (int t = 0; t < Tk - 1; t++) {
+        for (int i = 0; i < hmModel.getN(); i++) {
+            //大循环开始，分为三部分，第一部分为计算aMatrix，第二部分为计算bMatrix，第三部分计算piVector
+            //由于他们的维度不同，所以分开计算
+            //更新aMatrix
+            for (int j = 0; j < hmModel.getN(); j++) {
+                double a_numerator = 0;//新a矩阵的分子
+                double a_denominator = 0;//新a的分母
+                for (int k = 0; k < trainList.size(); k++) {
+                    int[] individualSeq = trainList.get(k);
+                    int Tk = individualSeq.length;
+                    GammaVector gammaVector = new GammaVector(individualSeq, hmModel);
+                    SigmaVector sigmaVector = new SigmaVector(hmModel, individualSeq);
+                    double a_fenmuTemp = 0;
+                    double a_fenziTemp = 0;
+                    double[] gammaVec = new double[Tk];
+                    for (int t = 0; t < Tk - 1; t++) {
+                        gammaVec[i] = gammaVector.calGammaVector(t, i);
+                        a_fenmuTemp += gammaVec[i];
+//                    }
+//                    for (int t = 0; t < Tk - 1; t++) {
+                        a_fenziTemp += sigmaVector.calSigma(t, i, j);
+                    }
+                    a_numerator += a_fenziTemp / prob_O[k];
+                    a_denominator += a_fenmuTemp / prob_O[k];
+
                 }
+                new_Amatrix[i][j] = a_numerator / a_denominator;
 
             }
+
+            //更新bMatrix
+            for (int p = 0; p < hmModel.getM(); p++) {//求bi(P)的新值
+                double b_numerator = 0;//b的分子
+                double b_denominator = 0;//b的分母
+                for (int k = 0; k < trainList.size(); k++) {
+                    int[] individualSeq = trainList.get(k);
+                    int Tk = individualSeq.length;
+                    GammaVector gammaVector = new GammaVector(individualSeq, hmModel);
+                    double b_fenmuTemp = 0;
+                    double b_fenziTemp = 0;
+                    double[] gammaVec = new double[Tk];
+                    for (int t = 0; t < Tk; t++) {//此处是iTk还是Tk-1，存疑
+                        gammaVec[t] = gammaVector.calGammaVector(t, i);
+                        b_fenmuTemp += gammaVec[t];
+//                    }
+//                    for (int t = 0; t < Tk ; t++) {
+                        if (individualSeq[t] == p) {
+                            b_fenziTemp += gammaVec[t];
+                        }
+                    }
+                    b_numerator += b_fenziTemp / prob_O[k];
+                    b_denominator += b_fenmuTemp / prob_O[k];
+                }
+                new_Bmatrix[i][p] = b_numerator / b_denominator;
+            }
+            //更新piVec
+            for (int k = 0; k < trainList.size(); k++) {
+                int[] individualSeq = trainList.get(k);
+                GammaVector gammaVector = new GammaVector(individualSeq, hmModel);
+                new_piVector[i] += (prob_O[k] / probSum) * gammaVector.calGammaVector(0, i);
+            }
+        }//大循环完毕，更新模型参数
+        if (isSmooth) {
+            for (int i = 0; i < hmModel.getN(); i++) {
+                RandomUtils.LaplaceSmooth(new_Amatrix[i], 0.0001);
+                RandomUtils.LaplaceSmooth(new_Bmatrix[i], 0.0001);
+            }
+            RandomUtils.LaplaceSmooth(new_piVector, 0.0001);
         }
+        hmModel.setAMatrix(new_Amatrix);
+        hmModel.setBMatrix(new_Bmatrix);
+        hmModel.setPiVector(new_piVector);
+        System.out.println("多观察序列训练完毕");
     }
+
 
     /**
      * 使用单个观测序列进行训练
