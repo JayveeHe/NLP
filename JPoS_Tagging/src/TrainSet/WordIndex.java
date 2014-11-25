@@ -14,9 +14,10 @@ import java.util.List;
  */
 public class WordIndex {
     private TrieTree indexTree;
-
+public int indexSum =0 ;
     public WordIndex(TrieTree indexTree) {
         this.indexTree = indexTree;
+        this.indexSum = indexTree.word_list.size()+1;
     }
 
 
