@@ -1,4 +1,4 @@
-package Test;
+package Tests;
 
 import HMM.BasicModel.HMModel;
 import HMM.Utils.SeqGenerator;

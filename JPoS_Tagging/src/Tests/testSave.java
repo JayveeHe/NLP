@@ -1,4 +1,4 @@
-package Test;
+package Tests;
 
 import HMM.BasicModel.HMModel;
 
@@ -8,9 +8,9 @@ import HMM.BasicModel.HMModel;
 public class testSave {
     public static void main(String[] a) {
         HMModel hmModel = new HMModel(40, 50000);
-        hmModel.saveModel("Test");
+        hmModel.saveModel("Tests");
 //        System.out.println(hmModel);
-        HMModel hmModel1 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\Test");
+        HMModel hmModel1 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\Tests");
 //        System.out.println(hmModel1);
     }
 }

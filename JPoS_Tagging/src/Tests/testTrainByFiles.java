@@ -1,4 +1,4 @@
-package Test;
+package Tests;
 
 import HMM.BasicModel.HMModel;
 import HMM.Baum_Welch.ForwardBackwardAlog;
@@ -20,10 +20,10 @@ public class testTrainByFiles {
         for (File classFile : dirRoot.listFiles()) {
 //            for (File txtFile : classFile.listFiles()) {
             File[] files = classFile.listFiles();
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 10; i++) {
                 File txtFile = files[i];
                 String txt = FileUtils.File2str(txtFile.getPath(), "utf-8");
-                int[] index = wordIndex.Sentence2Index(txt);
+                int[] index = wordIndex.Sentence2Index(txt).getIndex();
                 trainList.add(index);
             }
         }

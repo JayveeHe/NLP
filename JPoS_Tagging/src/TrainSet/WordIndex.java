@@ -14,10 +14,10 @@ import java.util.List;
  */
 public class WordIndex {
     private TrieTree indexTree;
-public int indexSum =0 ;
+    public int indexSum = 0;
+
     public WordIndex(TrieTree indexTree) {
         this.indexTree = indexTree;
-        this.indexSum = indexTree.word_list.size()+1;
     }
 
 
@@ -29,7 +29,7 @@ public int indexSum =0 ;
      */
     public static TrieTree getIDTree() {
         String NEWLINE = System.getProperty("line.separator");
-        String str = FileUtils.File2str("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\dict.txt", "utf-8");
+        String str = FileUtils.File2str("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\dict_reduced.txt", "utf-8");
         String[] split = str.split(NEWLINE);
         TrieTree trieTree = new TrieTree();
         //统计词汇并自动去重
@@ -58,20 +58,43 @@ public int indexSum =0 ;
      * @param sentence
      * @return
      */
-    public int[] Sentence2Index(String sentence) {
+    public IndexResult Sentence2Index(String sentence) {
         //首先进行句子的分词处理
         List<Term> terms = NlpAnalysis.parse(sentence);
         int T = terms.size();
+//        IndexResult[] infos = new IndexResult[T];
         int[] seq = new int[T];
+        String[] words = new String[T];
         //编号处理
         for (int i = 0; i < T; i++) {
+            words[i] = terms.get(i).getName();
             WordNode wordNode = indexTree.getWordNode(terms.get(i).getName());
             if (null != wordNode) {
+//                infos[i] = new IndexResult(wordNode.getWord(),wordNode.getFreq());
                 seq[i] = wordNode.getFreq();
             } else {
                 seq[i] = 0;//把0序号留给未发现词
+//                infos[i] = new IndexResult(terms.get(i).getName(),0);
             }
         }
-        return seq;
+        return new IndexResult(words, seq);
+    }
+
+    public class IndexResult {
+        private String[] word;
+        private int[] index;
+
+        public IndexResult(String[] word, int[] index) {
+            this.word = word;
+            this.index = index;
+        }
+
+        public String[] getWord() {
+            return word;
+        }
+
+        public int[] getIndex() {
+            return index;
+        }
     }
 }

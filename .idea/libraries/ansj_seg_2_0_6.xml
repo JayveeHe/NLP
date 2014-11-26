@@ -1,9 +1,13 @@
 <component name="libraryTable">
   <library name="ansj_seg-2.0.6">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/JPoS_Tagging/libs/ansj_seg-2.0.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Java/DataMining/topic_model/libs/ansj_seg-2.0.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Java/DataMining/topic_model/libs/nlp-lang-0.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Java/DataMining/topic_model/libs/org.json.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Java/DataMining/topic_model/libs/org.json.jar!/" />
+    </SOURCES>
   </library>
 </component>

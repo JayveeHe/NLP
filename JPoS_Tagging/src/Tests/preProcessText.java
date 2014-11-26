@@ -1,4 +1,4 @@
-package test;
+package Tests;
 
 /**
  * Created by ITTC-Jayvee on 2014/11/21.

@@ -1,4 +1,4 @@
-package Test;
+package Tests;
 
 import HMM.BasicModel.ForwardVector;
 import HMM.BasicModel.HMModel;
