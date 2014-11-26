@@ -22,7 +22,7 @@ public class testTrainByFiles {
             File[] files = classFile.listFiles();
             for (int i = 0; i < 10; i++) {
                 File txtFile = files[i];
-                String txt = FileUtils.File2str(txtFile.getPath(), "utf-8");
+                String txt = FileUtils.File2str(txtFile.getPath(), "gbk");
                 int[] index = wordIndex.Sentence2Index(txt).getIndex();
                 trainList.add(index);
             }
