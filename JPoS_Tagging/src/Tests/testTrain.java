@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public class testTrain {
     public static void main(String a[]) {
-        HMModel hmModel = new HMModel(10, 100000);
+        HMModel hmModel = new HMModel(10, 10000);
         ForwardBackwardAlog fba = new ForwardBackwardAlog(hmModel);
         int[] seq1 = {0, 1, 1, 1, 1, 1, 2, 3, 4, 1, 1, 1, 2, 3, 4};
         int[] seq2 = {2, 1, 1, 2, 2, 2, 2, 3, 4, 3, 2, 5, 1, 2, 6};
@@ -20,20 +20,32 @@ public class testTrain {
         trainList.add(seq1);
         trainList.add(seq2);
         trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+        trainList.add(seq3);
+
         ForwardVector forwardVector = new ForwardVector(hmModel);
         System.out.println("学习前概率：\n" + forwardVector.calObSeqProb(seq1, true));
         System.out.println(forwardVector.calObSeqProb(seq2, true));
         System.out.println(forwardVector.calObSeqProb(seq3, true));
 //        System.out.println(hmModel);
         for (int i = 0; i < 5; i++) {
-            fba.TrainByMultiObseq(trainList,false);
+            fba.TrainByMultiObseq(trainList, true);
             forwardVector = new ForwardVector(hmModel);
             System.out.println("学习后概率：\n" + forwardVector.calObSeqProb(seq1, true));
             System.out.println(forwardVector.calObSeqProb(seq2, true));
             System.out.println(forwardVector.calObSeqProb(seq3, true));
 //            System.out.println(hmModel);
+            hmModel.saveModel(System.currentTimeMillis() + "");
         }
-        fba.TrainByMultiObseq(trainList,true);
+        fba.TrainByMultiObseq(trainList, true);
         forwardVector = new ForwardVector(hmModel);
         System.out.println("学习后概率：\n" + forwardVector.calObSeqProb(seq1, true));
         System.out.println(forwardVector.calObSeqProb(seq2, true));

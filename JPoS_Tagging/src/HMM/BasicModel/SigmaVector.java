@@ -62,4 +62,21 @@ public class SigmaVector {
         return forwardMatrix[t][i] * aMatrix[i][j]
                 * bMatrix[j][obSequence[t + 1]] * backwardMatrix[t + 1][j];
     }
+
+    /**
+     * 计算Gamma值
+     *
+     * @param t
+     * @param i
+     * @return
+     */
+    public double calGammaVector(int t, int i) {
+        double ProbSum = 0;
+        for (int k = 0; k < hmModel.getN(); k++) {
+            ProbSum += forwardMatrix[t][k] * backwardMatrix[t][k];
+        }
+        double gamma_ti = forwardMatrix[t][i] * backwardMatrix[t][i] / ProbSum;
+        return gamma_ti;
+
+    }
 }

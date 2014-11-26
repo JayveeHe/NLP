@@ -1,10 +1,12 @@
 package TrainSet;
 
 import HMM.Utils.FileUtils;
+import TrainSet.DataStructure.IndexResult;
 import TrainSet.DataStructure.TrieTree;
 import TrainSet.DataStructure.WordNode;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.NlpAnalysis;
+import org.ansj.splitWord.analysis.ToAnalysis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class WordIndex {
 
     public WordIndex(TrieTree indexTree) {
         this.indexTree = indexTree;
+        this.indexSum = indexTree.word_list.size()+1;
     }
 
 
@@ -29,12 +32,12 @@ public class WordIndex {
      */
     public static TrieTree getIDTree() {
         String NEWLINE = System.getProperty("line.separator");
-        String str = FileUtils.File2str("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\dict_reduced.txt", "utf-8");
+        String str = FileUtils.File2str("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\myDict", "utf-8");
         String[] split = str.split(NEWLINE);
         TrieTree trieTree = new TrieTree();
         //统计词汇并自动去重
         for (String text : split) {
-            String[] words = text.split(" ");
+            String[] words = text.split("\t");
 //            Matcher lineMatcher = Pattern.compile(" ").matcher(text);
 //            if (lineMatcher.find()) {
             String word = words[0];
@@ -60,7 +63,7 @@ public class WordIndex {
      */
     public IndexResult Sentence2Index(String sentence) {
         //首先进行句子的分词处理
-        List<Term> terms = NlpAnalysis.parse(sentence);
+        List<Term> terms = ToAnalysis.parse(sentence);
         int T = terms.size();
 //        IndexResult[] infos = new IndexResult[T];
         int[] seq = new int[T];
@@ -80,21 +83,5 @@ public class WordIndex {
         return new IndexResult(words, seq);
     }
 
-    public class IndexResult {
-        private String[] word;
-        private int[] index;
 
-        public IndexResult(String[] word, int[] index) {
-            this.word = word;
-            this.index = index;
-        }
-
-        public String[] getWord() {
-            return word;
-        }
-
-        public int[] getIndex() {
-            return index;
-        }
-    }
 }

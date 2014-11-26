@@ -208,11 +208,12 @@ public class HMModel {
             root.put("piVector", piVectorArry);
 
             //写入文件
-            File dir = new File("");
-            String dirpath = dir.getAbsolutePath();
+//            File dir = new File("");
+            String dirpath = new File("").getAbsolutePath();
             File file = new File(dirpath + "/JPoS_Tagging/data/" + filename);
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(root.toString().getBytes("utf-8"));
+            System.out.println("模型保存完毕！路径：" + file.getAbsolutePath());
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
