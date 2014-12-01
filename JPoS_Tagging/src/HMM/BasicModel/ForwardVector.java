@@ -36,7 +36,10 @@ public class ForwardVector {
             //t=0时的初始化
             for (int i = 0; i < this.hmModel.getN(); i++) {
                 forwardVec[i] = piVector[i] * bMatrix[i][ObSequence[0]];
+
             }
+            double ct_init = calCtByRaw(forwardVec);
+            prob_log += -Math.log(ct_init);
             //t>0后的迭代
             for (int t = 1; t < T; t++) {//外层大循环
                 double[] rawAlphas = new double[hmModel.getN()];
@@ -71,6 +74,13 @@ public class ForwardVector {
         double[][] bMatrix = hmModel.getBMatrix();
         for (int i = 0; i < this.hmModel.getN(); i++) {
             forwardMatrix[0][i] = piVector[i] * bMatrix[i][ObSequence[0]];
+            if(isScaled){
+                //进行缩放,将缩放后的前向向量赋值给当前存储的前向向量
+                double ct = calCtByRaw(forwardMatrix[0]);
+                for (int k = 0; k < hmModel.getN(); k++) {
+                    forwardMatrix[0][k] = ct * forwardMatrix[0][k];
+                }
+            }
         }
         for (int t = 1; t < T; t++) {//外层大循环
             for (int j = 0; j < hmModel.getN(); j++) {

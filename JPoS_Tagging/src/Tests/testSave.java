@@ -7,10 +7,15 @@ import HMM.BasicModel.HMModel;
  */
 public class testSave {
     public static void main(String[] a) {
-        HMModel hmModel = new HMModel(40, 50000);
-        hmModel.saveModel("Tests");
-//        System.out.println(hmModel);
-        HMModel hmModel1 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\Tests");
-//        System.out.println(hmModel1);
+//        HMModel hmModel = new HMModel(40, 50000);
+//        hmModel.saveModel("Tests");
+////        System.out.println(hmModel);
+//        HMModel hmModel1 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\Tests");
+////        System.out.println(hmModel1);
+        for (int i = 0; i < 100; i++) {
+            System.out.println(
+                    (int)(Math.random()*100)
+            );
+        }
     }
 }

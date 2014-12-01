@@ -1,4 +1,4 @@
-package HMM.Utils;
+package Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;

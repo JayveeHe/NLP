@@ -1,4 +1,6 @@
-package HMM.Utils;
+package Utils;
+
+import java.math.BigDecimal;
 
 /**
  * Created by Jayvee on 2014/11/14.
@@ -13,18 +15,35 @@ public class RandomUtils {
     public static void randomInitProb(double[] toInitValues) {
         int N = toInitValues.length;
         double probSum = 0;//已分配的概率和
+        BigDecimal probSum_big = BigDecimal.valueOf(0);
         for (int i = 0; i < N - 1; i++) {
             double temp = Math.random() * (1 - probSum);
-//            toInitValues[((int) (Math.random() * N))] += temp;
-            toInitValues[i] = temp;
+            toInitValues[((int) (Math.random() * N))] += temp;
+//            toInitValues[i] = temp;
             probSum += temp;
+            probSum_big =probSum_big.add(BigDecimal.valueOf(temp));
 //            if (probSum == 1) {
 //                break;
 //            }
         }
 //        toInitValues[((int) (Math.random() * N))] += 1 - probSum;
-        toInitValues[N - 1] = 1 - probSum;
+        toInitValues[((int) (Math.random() * N))] += 1 - probSum_big.doubleValue();
+//        toInitValues[N - 1] = 1 - probSum;
 //        System.out.println(isStochastic(toInitValues));
+    }
+
+
+    /**
+     * 平均分配概率
+     *
+     * @param toInitValues
+     */
+    public static void meansInitProb(double[] toInitValues) {
+        int N = toInitValues.length;
+        for (int i = 0; i < N; i++) {
+            toInitValues[i] = (double) 1.0f / N;
+
+        }
     }
 
     /**
@@ -35,19 +54,21 @@ public class RandomUtils {
      */
     public static boolean isStochastic(double[] testProbs) {
         double sum = 0;
+        BigDecimal sum_big = BigDecimal.valueOf(0);
         for (int i = 0; i < testProbs.length; i++) {
 //            if (testProbs[i] != 0) {
-            sum += testProbs[i];
-
+//            sum += testProbs[i];
+            sum_big = sum_big.add(BigDecimal.valueOf(testProbs[i]));
 //            }
         }
-        double temp = sum - 1;
+        double temp = sum_big.doubleValue() - 1;
         if (temp == 0) {
             return true;
         } else {
             temp = Math.log10(temp * temp);
             return temp < -29;
         }
+//        return sum_big.doubleValue() == 1.0f;
     }
 
     /**

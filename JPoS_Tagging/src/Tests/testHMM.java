@@ -55,7 +55,7 @@ public class testHMM {
         System.out.println(text);
         ForwardBackwardAlog fba = new ForwardBackwardAlog(hmModel);
         for (int i = 0; i < 20; i++) {
-            fba.TrainBySingleObseq(testSeq);
+            fba.TrainBySingleObseq(testSeq,true);
 //            System.out.println(hmModel);
 //            forwardVector = new ForwardVector(hmModel);
 //            ViterbiDecoder vd = new ViterbiDecoder(hmModel);

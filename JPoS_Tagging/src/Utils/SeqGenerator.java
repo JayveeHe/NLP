@@ -1,7 +1,6 @@
-package HMM.Utils;
+package Utils;
 
 import HMM.BasicModel.HMModel;
-import HMM.Viterbi.ViterbiDecoder;
 
 /**
  * Created by Jayvee on 2014/11/19.

@@ -2,8 +2,10 @@ package HMM.Baum_Welch;
 
 
 import HMM.BasicModel.*;
-import HMM.Utils.RandomUtils;
+import Utils.RandomUtils;
+import Utils.org.nevec.rjm.BigDecimalMath;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -32,13 +34,25 @@ public class ForwardBackwardAlog {
      */
     public void TrainByMultiObseq(ArrayList<int[]> trainList, boolean isSmooth) {
         //TODO 多观测序列的训练
-        double[] prob_O = calPK(trainList, hmModel);
-        double[][] new_Amatrix = new double[hmModel.getN()][hmModel.getN()];
-        double[][] new_Bmatrix = new double[hmModel.getN()][hmModel.getM()];
-        double[] new_piVector = new double[hmModel.getN()];
+        double[] prob_O_log = calPK(trainList, hmModel);
+        BigDecimal[] prob_O_big = new BigDecimal[prob_O_log.length];//为防止溢出而使用
+        BigDecimal probSum_Big = BigDecimal.valueOf(0);
+        int hmModelN = hmModel.getN();
+        int hmModelM = hmModel.getM();
+        double[][] new_Amatrix = new double[hmModelN][hmModelN];
+        double[][] new_Bmatrix = new double[hmModelN][hmModelM];
+        double[] new_piVector = new double[hmModelN];
         double probSum = 0;
+        probSum_Big.setScale(100,BigDecimal.ROUND_DOWN);
         for (int q = 0; q < trainList.size(); q++) {
-            probSum += prob_O[q];
+            BigDecimal logtemp = new BigDecimal(prob_O_log[q]);
+            BigDecimal pow = BigDecimalMath.pow(new BigDecimal(Math.E), logtemp);
+            if(Double.isInfinite(pow.doubleValue())||Double.isNaN(pow.doubleValue())){
+                System.out.println("prob_O index="+q);
+            }
+            prob_O_big[q] = pow;
+            probSum_Big = probSum_Big.add(prob_O_big[q]);
+            probSum += prob_O_log[q];
         }
 
 
@@ -47,15 +61,18 @@ public class ForwardBackwardAlog {
         SigmaVector[] sigmaVectors = new SigmaVector[trainList.size()];
         for (int k = 0; k < trainList.size(); k++) {
             int[] individualSeq = trainList.get(k);
-            sigmaVectors[k] = new SigmaVector(hmModel, individualSeq);
+            sigmaVectors[k] = new SigmaVector(hmModel, individualSeq,false);
         }
-        for (int i = 0; i < hmModel.getN(); i++) {
+        for (int i = 0; i < hmModelN; i++) {
             //大循环开始，分为三部分，第一部分为计算aMatrix，第二部分为计算bMatrix，第三部分计算piVector
             //由于他们的维度不同，所以分开计算
             //更新aMatrix
-            for (int j = 0; j < hmModel.getN(); j++) {
+            System.out.println("\t更新第"+i+"个状态的转移概率");
+            for (int j = 0; j < hmModelN; j++) {
                 double a_numerator = 0;//新a矩阵的分子
                 double a_denominator = 0;//新a的分母
+                BigDecimal a_numerator_big = BigDecimal.valueOf(0);
+                BigDecimal a_denominator_big = BigDecimal.valueOf(0);
                 for (int k = 0; k < trainList.size(); k++) {
                     int[] individualSeq = trainList.get(k);
                     int Tk = individualSeq.length;
@@ -63,60 +80,107 @@ public class ForwardBackwardAlog {
 //                    SigmaVector sigmaVector = new SigmaVector(hmModel, individualSeq);
                     double a_fenmuTemp = 0;
                     double a_fenziTemp = 0;
+                    BigDecimal a_fenmuTemp_big = BigDecimal.valueOf(0);
+                    BigDecimal a_fenziTemp_big = BigDecimal.valueOf(0);
                     double[] gammaVec = new double[Tk];
                     for (int t = 0; t < Tk - 1; t++) {
-                        gammaVec[i] = sigmaVectors[k].calGammaVector(t, i);
-                        a_fenmuTemp += gammaVec[i];
+//                        double temp = sigmaVectors[k].calGammaVector(t, i);
+                        double temp = sigmaVectors[k].calGammaTemp(t, i);
+                        gammaVec[t] = temp;
+                        a_fenmuTemp += gammaVec[t];
+                        a_fenmuTemp_big = a_fenmuTemp_big.add(new BigDecimal(gammaVec[t]));
 //                    }
 //                    for (int t = 0; t < Tk - 1; t++) {
-                        a_fenziTemp += sigmaVectors[k].calSigma(t, i, j);
+//                        a_fenziTemp += sigmaVectors[k].calSigma(t, i, j);
+                        double stemp = sigmaVectors[k].calSigmaTemp(t, i, j);
+                        a_fenziTemp += stemp;
+                        a_fenziTemp_big = a_fenziTemp_big.add(new BigDecimal(stemp));
                     }
-                    a_numerator += a_fenziTemp / prob_O[k];
-                    a_denominator += a_fenmuTemp / prob_O[k];
+//                    BigDecimal ddd = a_fenziTemp_big.divide(prob_O_big[k],100,BigDecimal.ROUND_HALF_UP);
+                    a_numerator_big = a_numerator_big.add(a_fenziTemp_big.divide(prob_O_big[k], 100, BigDecimal.ROUND_DOWN));
+                    a_denominator_big = a_denominator_big.add(a_fenmuTemp_big.divide(prob_O_big[k], 100, BigDecimal.ROUND_DOWN));
+                    if(a_denominator_big.doubleValue()==0){
+                        System.out.println(i+"====="+j);
+                    }
+//                    TODO 为了防止数据溢出，进行妥协
+//                    if (Math.log10(prob_O_log[k]) > -100) {
+//                        a_numerator += a_fenziTemp / prob_O_log[k];
+//                        a_denominator += a_fenmuTemp / prob_O_log[k];
+//                    }
+//                    a_numerator += a_fenziTemp * prob_O[k] / probSum;
+//                    a_denominator += a_fenmuTemp * prob_O[k] / probSum;
 
                 }
-                new_Amatrix[i][j] = a_numerator / a_denominator;
-
+//                new_Amatrix[i][j] = a_numerator / a_denominator;
+                new_Amatrix[i][j] = a_numerator_big.divide(a_denominator_big, 100, BigDecimal.ROUND_DOWN).floatValue();
             }
 
             //更新bMatrix
-            for (int p = 0; p < hmModel.getM(); p++) {//求bi(P)的新值
+            System.out.println("\t更新第" + i + "个状态的符号概率");
+            for (int p = 0; p < hmModelM; p++) {//求bi(P)的新值
                 double b_numerator = 0;//b的分子
                 double b_denominator = 0;//b的分母
+                BigDecimal b_numerator_big = BigDecimal.valueOf(0);
+                BigDecimal b_denominator_big = BigDecimal.valueOf(0);
                 for (int k = 0; k < trainList.size(); k++) {
                     int[] individualSeq = trainList.get(k);
                     int Tk = individualSeq.length;
 //                    GammaVector gammaVector = new GammaVector(individualSeq, hmModel);
                     double b_fenmuTemp = 0;
                     double b_fenziTemp = 0;
+                    BigDecimal b_fenmuTemp_big = BigDecimal.valueOf(0);
+                    BigDecimal b_fenziTemp_big = BigDecimal.valueOf(0);
+
                     double[] gammaVec = new double[Tk];
                     for (int t = 0; t < Tk; t++) {//此处是iTk还是Tk-1，存疑
-                        gammaVec[t] = sigmaVectors[k].calGammaVector(t, i);
+//                        gammaVec[t] = sigmaVectors[k].calGammaVector(t, i);
+                        gammaVec[t] = sigmaVectors[k].calGammaTemp(t, i);
                         b_fenmuTemp += gammaVec[t];
+                        b_fenmuTemp_big = b_fenmuTemp_big.add(new BigDecimal(gammaVec[t]));
 //                    }
 //                    for (int t = 0; t < Tk ; t++) {
                         if (individualSeq[t] == p) {
                             b_fenziTemp += gammaVec[t];
+                            b_fenziTemp_big = b_fenziTemp_big.add(new BigDecimal(gammaVec[t]));
                         }
                     }
-                    b_numerator += b_fenziTemp / prob_O[k];
-                    b_denominator += b_fenmuTemp / prob_O[k];
+                    b_numerator_big = b_numerator_big.add(b_fenziTemp_big.divide(prob_O_big[k], 100, BigDecimal.ROUND_DOWN));
+                    b_denominator_big = b_denominator_big.add(b_fenmuTemp_big.divide(prob_O_big[k], 100, BigDecimal.ROUND_DOWN));
+                    if(b_denominator_big.doubleValue()==0){
+                        System.out.println(i+"=====p="+p);
+                    }
+//                    //TODO 为了防止数据溢出，进行妥协
+//                    if (Math.log10(prob_O_log[k]) > -100) {
+//                        b_numerator += b_fenziTemp / prob_O_log[k];
+//                        b_denominator += b_fenmuTemp / prob_O_log[k];
+//                    }
+//                    b_numerator += b_fenziTemp * prob_O[k] / probSum;
+//                    b_denominator += b_fenmuTemp * prob_O[k] / probSum;
                 }
-                new_Bmatrix[i][p] = b_numerator / b_denominator;
+//                new_Bmatrix[i][p] = b_numerator / b_denominator;
+                new_Bmatrix[i][p] = b_numerator_big.divide(b_denominator_big, 100, BigDecimal.ROUND_DOWN).floatValue();
             }
             //更新piVec
+            System.out.println("\t更新第"+i+"个状态的初始概率");
             for (int k = 0; k < trainList.size(); k++) {
-                int[] individualSeq = trainList.get(k);
+//                int[] individualSeq = trainList.get(k);
 //                GammaVector gammaVector = new GammaVector(individualSeq, hmModel);
-                new_piVector[i] += (prob_O[k] / probSum) * sigmaVectors[k].calGammaVector(0, i);
+                BigDecimal piTemp_big = prob_O_big[k].divide(probSum_Big, 100, BigDecimal.ROUND_DOWN);
+                BigDecimal pi_big = BigDecimal.valueOf(0);
+                double gammaTemp = sigmaVectors[k].calGammaVector(0, i);
+                new_piVector[i] += piTemp_big.doubleValue() * gammaTemp;
+//                System.out.println("k="+k+"\tnew_piVector="+new_piVector[i]+"\tgammaTemp="+gammaTemp);
+//                new_piVector[i] += sigmaVectors[k].calGammaTemp(0, i) / prob_O[k];
             }
+            System.out.println("\t第"+i+"个状态计算完成");
         }//大循环完毕，更新模型参数
         if (isSmooth) {
-            for (int i = 0; i < hmModel.getN(); i++) {
-                RandomUtils.LaplaceSmooth(new_Amatrix[i], 0.0000001);
-                RandomUtils.LaplaceSmooth(new_Bmatrix[i], 0.0000001);
+            double smoothFactor = Math.pow(0.1,100);
+            for (int i = 0; i < hmModelN; i++) {
+                RandomUtils.LaplaceSmooth(new_Amatrix[i], smoothFactor);
+                RandomUtils.LaplaceSmooth(new_Bmatrix[i], smoothFactor);
             }
-            RandomUtils.LaplaceSmooth(new_piVector, 0.0000001);
+            RandomUtils.LaplaceSmooth(new_piVector, smoothFactor);
         }
         hmModel.setAMatrix(new_Amatrix);
         hmModel.setBMatrix(new_Bmatrix);
@@ -132,7 +196,7 @@ public class ForwardBackwardAlog {
      * @param isSmooth     是否对参数进行拉普拉斯平滑
      * @param sigmaVectors sigma数组，多次大循环的情况下避免重复计算
      */
-    private void TrainByMultiObseq(ArrayList<int[]> trainList, boolean isSmooth, SigmaVector[] sigmaVectors) {
+    public void TrainByMultiObseq(ArrayList<int[]> trainList, boolean isSmooth, SigmaVector[] sigmaVectors) {
         //TODO 多观测序列的训练
         double[] prob_O = calPK(trainList, hmModel);
         double[][] new_Amatrix = new double[hmModel.getN()][hmModel.getN()];
@@ -165,9 +229,12 @@ public class ForwardBackwardAlog {
                     double a_fenziTemp = 0;
                     double[] gammaVec = new double[Tk];
                     for (int t = 0; t < Tk - 1; t++) {
-                        gammaVec[i] = sigmaVectors[k].calGammaVector(t, i);
-                        a_fenmuTemp += gammaVec[i];
-                        a_fenziTemp += sigmaVectors[k].calSigma(t, i, j);
+//                        double temp = sigmaVectors[k].calGammaVector(t, i);
+                        double temp = sigmaVectors[k].calGammaTemp(t, i);
+                        gammaVec[t] = temp;
+                        a_fenmuTemp += gammaVec[t];
+//                        a_fenziTemp += sigmaVectors[k].calSigma(t, i, j);
+                        a_fenziTemp += sigmaVectors[k].calSigmaTemp(t, i, j);
                     }
                     a_numerator += a_fenziTemp / prob_O[k];
                     a_denominator += a_fenmuTemp / prob_O[k];
@@ -228,7 +295,7 @@ public class ForwardBackwardAlog {
         SigmaVector[] sigmaVectors = new SigmaVector[trainList.size()];
         for (int k = 0; k < trainList.size(); k++) {
             int[] individualSeq = trainList.get(k);
-            sigmaVectors[k] = new SigmaVector(hmModel, individualSeq);
+            sigmaVectors[k] = new SigmaVector(hmModel, individualSeq,true);
         }
         Date date = new Date(System.currentTimeMillis());
         for (int i = 0; i < iterNum; i++) {
@@ -247,13 +314,13 @@ public class ForwardBackwardAlog {
      *
      * @param trainObseq 观测序列
      */
-    public void TrainBySingleObseq(int[] trainObseq) {
+    public void TrainBySingleObseq(int[] trainObseq,boolean isScaled) {
         int T = trainObseq.length;
         double[][] new_Amatrix = new double[hmModel.getN()][hmModel.getN()];
         double[][] new_Bmatrix = new double[hmModel.getN()][hmModel.getM()];
         double[] new_piVector = new double[hmModel.getN()];
 //        GammaVector gammaVector = new GammaVector(trainObseq, hmModel);
-        SigmaVector sigmaVector = new SigmaVector(hmModel, trainObseq);
+        SigmaVector sigmaVector = new SigmaVector(hmModel, trainObseq,isScaled);
         for (int i = 0; i < hmModel.getN(); i++) {
             //更新pi
             new_piVector[i] = sigmaVector.calGammaVector(0, i);
@@ -308,6 +375,7 @@ public class ForwardBackwardAlog {
 
     /**
      * 计算各观测序列的概率值
+     * 已经进行缩放处理
      *
      * @param listTrain
      * @param hmModel
@@ -321,6 +389,7 @@ public class ForwardBackwardAlog {
         for (int k = 0; k < K; k++) {
             p_o_lamda[k] = forwardVector.calObSeqProb(listTrain.get(k), true);
         }
+
         return p_o_lamda;
     }
 }

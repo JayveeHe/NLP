@@ -1,11 +1,10 @@
 package Tests;
 
-import HMM.Utils.FileUtils;
+import Utils.FileUtils;
 import TrainSet.DataStructure.TrieTree;
 import TrainSet.DataStructure.WordNode;
 import org.ansj.domain.Term;
 import org.ansj.recognition.NatureRecognition;
-import org.ansj.splitWord.analysis.NlpAnalysis;
 import org.ansj.splitWord.analysis.ToAnalysis;
 
 import java.io.File;
@@ -60,6 +59,6 @@ public class preProcessDict {
                 e.printStackTrace();
             }
         }
-        System.out.println("完成训练序列的读取");
+        System.out.println("完成词典读取，路径：" + file.getAbsolutePath());
     }
 }

@@ -1,7 +1,7 @@
 package Tests;
 
 import HMM.BasicModel.HMModel;
-import HMM.Utils.SeqGenerator;
+import Utils.SeqGenerator;
 import HMM.Viterbi.ViterbiDecoder;
 
 /**
@@ -22,10 +22,10 @@ public class testSeqGenerator {
 //        for (int k = 0; k < probs.length; k++) {
 //            System.out.println(count[k] / 100000f);
 //        }
-        HMModel hmModel = new HMModel(10, 100);
+        HMModel hmModel = new HMModel(10, 100000);
         SeqGenerator sg = new SeqGenerator(hmModel);
-        int[] seq = sg.genHiddenSeq(100, 0);
-        int[] obseq = sg.genObSeq(seq, 0.4);
+        int[] seq = sg.genHiddenSeq(100, 1);
+        int[] obseq = sg.genObSeq(seq, 0.8);
         String txt = "原始序列：\n";
         for (int i : seq) {
             txt = txt + i + "\t";

@@ -1,11 +1,10 @@
 package TrainSet;
 
-import HMM.Utils.FileUtils;
+import Utils.FileUtils;
 import TrainSet.DataStructure.IndexResult;
 import TrainSet.DataStructure.TrieTree;
 import TrainSet.DataStructure.WordNode;
 import org.ansj.domain.Term;
-import org.ansj.splitWord.analysis.NlpAnalysis;
 import org.ansj.splitWord.analysis.ToAnalysis;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class WordIndex {
 
     public WordIndex(TrieTree indexTree) {
         this.indexTree = indexTree;
-        this.indexSum = indexTree.word_list.size()+1;
+        this.indexSum = indexTree.word_list.size() + 1;
     }
 
 
@@ -51,6 +50,7 @@ public class WordIndex {
         for (int i = 0; i < wordlist.size(); i++) {
             idTree.addWord(wordlist.get(i).getWord(), i + 1);
         }
+        System.out.println("完成词典读取，词数：" + idTree.word_list.size());
         return idTree;
     }
 

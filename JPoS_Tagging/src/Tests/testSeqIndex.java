@@ -1,6 +1,6 @@
 package Tests;
 
-import HMM.Utils.FileUtils;
+import Utils.FileUtils;
 import TrainSet.DataStructure.IndexResult;
 import TrainSet.WordIndex;
 
