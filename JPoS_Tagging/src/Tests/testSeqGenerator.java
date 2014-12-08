@@ -22,40 +22,49 @@ public class testSeqGenerator {
 //        for (int k = 0; k < probs.length; k++) {
 //            System.out.println(count[k] / 100000f);
 //        }
-        HMModel hmModel = new HMModel(10, 100000);
+//        HMModel hmModel = new HMModel(500, 1000);
+
+        HMModel hmModel = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\seqGenModel");
+//        hmModel.saveModel("seqGenModel");
         SeqGenerator sg = new SeqGenerator(hmModel);
-        int[] seq = sg.genHiddenSeq(100, 1);
-        int[] obseq = sg.genObSeq(seq, 0.8);
-        String txt = "原始序列：\n";
-        for (int i : seq) {
-            txt = txt + i + "\t";
-//            System.out.println(i);
-        }
-        System.out.println(txt);
-        txt = "观察序列：\n";
-        for (int i : obseq) {
-            txt = txt + i + "\t";
-//            System.out.println(i);
-        }
-        System.out.println(txt);
+        int[] seq = sg.genHiddenSeq(10000, 0.7);
+        int[] obseq = sg.genObSeq(seq, 1);
+//        String txt = "原始序列：\n";
+//        for (int i : seq) {
+//            txt = txt + i + "\t";
+////            System.out.println(i);
+//        }
+//        System.out.println(txt);
+//        txt = "观察序列：\n";
+//        for (int i : obseq) {
+//            txt = txt + i + "\t";
+////            System.out.println(i);
+//        }
+//        System.out.println(txt);
         ViterbiDecoder vd = new ViterbiDecoder(hmModel);
         ViterbiDecoder.DecodeResult decodeResult = vd.decode(obseq, true);
         int[] decodeSeq = decodeResult.getPath();
-        txt = "译码序列：\n";
-        for (int i : decodeSeq) {
-            txt = txt + i + "\t";
-//            System.out.println(i);
-        }
-        System.out.println(txt);
-        System.out.println("译码路径概率：" + decodeResult.getPathProb());
-        //对比原始序列
         int errCount = 0;
-        for (int i = 0; i < decodeSeq.length; i++) {
-            if (decodeSeq[i] != seq[i]) {
-                errCount++;
-            }
-        }
-        System.out.println(Math.log((double) errCount / decodeSeq.length));
+//        txt = "译码序列：\n";
+//        for (int i = 0; i < decodeSeq.length; i++) {
+//            if (decodeSeq[i] != seq[i]) {
+//                errCount++;
+//                txt = txt + "[" + decodeSeq[i] + "]" + "\t";
+//            } else {
+//                txt = txt + decodeSeq[i] + "\t";
+////            System.out.println(i);
+//            }
+//        }
+//        System.out.println(txt);
+//        System.out.println("译码路径概率：" + decodeResult.getPathProb());
+        //对比原始序列
+
+//        for (int i = 0; i < decodeSeq.length; i++) {
+//            if (int i = 0; i < decodeSeq.length; i++) {
+//                errCount++;
+//            }
+//        }
+        System.out.println("译码错误率：" + (double) errCount / decodeSeq.length + "(" + errCount + "/" + decodeSeq.length + ")");
 
 //        ForwardBackwardAlog fba = new ForwardBackwardAlog(hmModel);
 //        for (int i = 0; i < 50; i++) {
@@ -75,4 +84,6 @@ public class testSeqGenerator {
 //        }
 //        System.out.println((double) errCount / decodeSeq.length);
     }
+
+
 }

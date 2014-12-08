@@ -10,12 +10,12 @@ import java.util.Arrays;
  */
 public class testViterbi {
     public static void main(String[] a) {
-        HMModel hmModel1 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\1417260545252");
-        HMModel hmModel2 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\1417264285251");
+        HMModel hmModel1 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\1417431744986");
+        HMModel hmModel2 = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\1417431690325");
 //        HMModel hmModel1 = new HMModel(12,1000);
 //        HMModel hmModel2 = new HMModel(12,100);
-        int[] seq1 = {0, 1, 1, 1, 1, 1, 2, 3, 4, 1, 1, 2, 2, 3, 4};
-        int[] seq2 = {2, 1, 1, 3, 1, 2, 2, 3, 4, 3, 2, 5, 1, 2, 6};
+        int[] seq1 = {0, 1, 1, 7, 1,7, 2, 3, 4, 1, 1, 2, 2, 3, 4};
+        int[] seq2 = {2, 1, 1, 3, 1, 2, 2, 1, 1, 3, 2, 5, 1, 2, 6};
 //        int[] seq3 = {0, 4, 7, 8, 8, 5, 4, 6, 2, 2, 3, 3, 4, 1, 1};
         ViterbiDecoder vd1 = new ViterbiDecoder(hmModel1);
         ViterbiDecoder vd2 = new ViterbiDecoder(hmModel2);

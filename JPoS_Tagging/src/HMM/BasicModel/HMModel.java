@@ -52,10 +52,11 @@ public class HMModel {
         this.BMatrix = new double[N][M];
         this.piVector = new double[N];
         for (int i = 0; i < N; i++) {
-//            RandomUtils.randomInitProb(AMatrix[i]);
+            RandomUtils.randomInitProb(AMatrix[i]);
+            RandomUtils.LaplaceSmooth(AMatrix[i],0.0000001f);
             RandomUtils.randomInitProb(BMatrix[i]);
             RandomUtils.LaplaceSmooth(BMatrix[i],0.0000001f);
-            RandomUtils.meansInitProb(AMatrix[i]);
+//            RandomUtils.meansInitProb(AMatrix[i]);
 //            RandomUtils.meansInitProb(BMatrix[i]);
         }
         RandomUtils.meansInitProb(piVector);

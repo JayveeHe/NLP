@@ -1,6 +1,7 @@
 package Utils;
 
 import java.math.BigDecimal;
+import java.util.Random;
 
 /**
  * Created by Jayvee on 2014/11/14.
@@ -15,19 +16,21 @@ public class RandomUtils {
     public static void randomInitProb(double[] toInitValues) {
         int N = toInitValues.length;
         double probSum = 0;//已分配的概率和
-        BigDecimal probSum_big = BigDecimal.valueOf(0);
+        Random r = new Random(System.currentTimeMillis());
+//        BigDecimal probSum_big = BigDecimal.valueOf(0);
+//        probSum_big =probSum_big.setScale(30);
         for (int i = 0; i < N - 1; i++) {
-            double temp = Math.random() * (1 - probSum);
-            toInitValues[((int) (Math.random() * N))] += temp;
+            double temp = r.nextDouble() * (1 - probSum);
+            toInitValues[((int) (r.nextDouble() * N))] += temp;
 //            toInitValues[i] = temp;
             probSum += temp;
-            probSum_big =probSum_big.add(BigDecimal.valueOf(temp));
+//            probSum_big =probSum_big.add(BigDecimal.valueOf(temp).setScale(30));
 //            if (probSum == 1) {
 //                break;
 //            }
         }
-//        toInitValues[((int) (Math.random() * N))] += 1 - probSum;
-        toInitValues[((int) (Math.random() * N))] += 1 - probSum_big.doubleValue();
+        toInitValues[((int) (Math.random() * N))] += 1 - probSum;
+//        toInitValues[((int) (r.nextDouble() * N))] += 1 - probSum_big.doubleValue();
 //        toInitValues[N - 1] = 1 - probSum;
 //        System.out.println(isStochastic(toInitValues));
     }

@@ -1,6 +1,8 @@
 package HMM.BasicModel;
 
 
+import java.util.ArrayList;
+
 /**
  * Created by Jayvee on 2014/11/6.
  */
@@ -74,7 +76,7 @@ public class ForwardVector {
         double[][] bMatrix = hmModel.getBMatrix();
         for (int i = 0; i < this.hmModel.getN(); i++) {
             forwardMatrix[0][i] = piVector[i] * bMatrix[i][ObSequence[0]];
-            if(isScaled){
+            if (isScaled) {
                 //进行缩放,将缩放后的前向向量赋值给当前存储的前向向量
                 double ct = calCtByRaw(forwardMatrix[0]);
                 for (int k = 0; k < hmModel.getN(); k++) {
@@ -152,6 +154,7 @@ public class ForwardVector {
         }
         return 1 / ctemp;
     }
+
 
 
 }

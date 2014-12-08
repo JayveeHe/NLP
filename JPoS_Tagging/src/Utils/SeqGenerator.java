@@ -2,14 +2,22 @@ package Utils;
 
 import HMM.BasicModel.HMModel;
 
+import java.util.Random;
+
 /**
  * Created by Jayvee on 2014/11/19.
  */
 public class SeqGenerator {
     HMModel hmModel;
+    double[][] aMatrix;
+    double[][] bMatrix;
+    double[] piVector;
 
     public SeqGenerator(HMModel hmModel) {
         this.hmModel = hmModel;
+        this.aMatrix = hmModel.getAMatrix();
+        this.bMatrix = hmModel.getBMatrix();
+        this.piVector = hmModel.getPiVector();
     }
 
     /**
@@ -20,16 +28,14 @@ public class SeqGenerator {
      * @return
      */
     public int[] genHiddenSeq(int n, double noiseRate) {
-        double[][] aMatrix = hmModel.getAMatrix();
         int[] result = new int[n];
         int randCount = 0;
         if (Math.random() > noiseRate) {
-            result[0] = pickMaxIndex(aMatrix[0]);
+            result[0] = pickMaxIndex(piVector);
         } else {
-            result[0] = pickRandomIndex(aMatrix[0]);
+            result[0] = pickRandomIndex(piVector);
             randCount++;
         }
-
         for (int i = 1; i < n; i++) {
             if (Math.random() > noiseRate) {
                 result[i] = pickMaxIndex(aMatrix[result[i - 1]]);
@@ -55,10 +61,10 @@ public class SeqGenerator {
      * @return
      */
     public int[] genObSeq(int[] hiddenSeq, double noiseRate) {
-        double[][] bMatrix = hmModel.getBMatrix();
         int[] result = new int[hiddenSeq.length];
         int randCount = 0;
-        if (Math.random() > noiseRate) {
+        Random r = new Random(System.currentTimeMillis());
+        if (r.nextDouble() > noiseRate) {
             result[0] = pickMaxIndex(bMatrix[hiddenSeq[0]]);
         } else {
             result[0] = pickRandomIndex(bMatrix[hiddenSeq[0]]);
@@ -66,7 +72,7 @@ public class SeqGenerator {
         }
 
         for (int i = 1; i < hiddenSeq.length; i++) {
-            if (Math.random() > noiseRate) {
+            if (r.nextDouble() > noiseRate) {
                 result[i] = pickMaxIndex(bMatrix[hiddenSeq[i]]);
             } else {
                 result[i] = pickRandomIndex(bMatrix[hiddenSeq[i]]);
@@ -85,10 +91,11 @@ public class SeqGenerator {
      * @return 当概率数组符合概率约束时，返回所选序号；否则返回-1
      */
     public static int pickRandomIndex(double[] probs) {
-        if (!RandomUtils.isStochastic(probs)) {
-            return -1;
-        }
-        double prob = Math.random();
+//        if (!RandomUtils.isStochastic(probs)) {
+//            return -1;
+//        }
+        Random r = new Random(System.currentTimeMillis());
+        double prob = r.nextDouble();
         int i = 0;
         for (i = 0; i < probs.length; i++) {
             prob -= probs[i];
@@ -104,9 +111,9 @@ public class SeqGenerator {
      * @return 当概率数组符合概率约束时，返回所选序号；否则返回-1
      */
     public static int pickMaxIndex(double[] probs) {
-        if (!RandomUtils.isStochastic(probs)) {
-            return -1;
-        }
+//        if (!RandomUtils.isStochastic(probs)) {
+//            return -1;
+//        }
         int i = 0;
         int result = 0;
         double max = 0;

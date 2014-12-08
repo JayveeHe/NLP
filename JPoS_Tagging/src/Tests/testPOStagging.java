@@ -12,10 +12,10 @@ import java.util.Arrays;
  */
 public class testPOStagging {
     public static void main(String a[]) {
-        HMModel hmModel = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\hmmData");
+        HMModel hmModel = new HMModel("D:\\CS\\Git\\NLP\\JPoS_Tagging\\data\\hmmData-0");
         ViterbiDecoder vd = new ViterbiDecoder(hmModel);
         WordIndex wordIndex = new WordIndex(WordIndex.getIDTree());
-        String source = "我现在以为，人与人之间的关系，最重要的不是怎么跟人打交道，而是跟自己打交道。";
+        String source = "在协作分集系统中, 不同中继与目的端之间信号的时间延迟和频率偏移均不相同, 因而同时估计各中继与目的端之间的定时和频率偏移是协作分集系统同步中最关键、最具挑战性的部分之一.";
         int[] seq;
         IndexResult indexResult = wordIndex.Sentence2Index(source);
         seq = indexResult.getIndex();
