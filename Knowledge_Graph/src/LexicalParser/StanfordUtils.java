@@ -1,7 +1,7 @@
 package LexicalParser;
 
+import BasicStructure.ParserManager;
 import BasicStructure.ParserNode;
-import BasicStructure.ParserTree;
 import Utils.FileUtils;
 import Utils.IDFCaculator;
 import Utils.WordNode;
@@ -9,13 +9,14 @@ import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure;
-import edu.stanford.nlp.trees.international.pennchinese.ChineseUtils;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.NlpAnalysis;
-import edu.stanford.nlp.trees.*;
 import org.nlpcn.commons.lang.standardization.SentencesUtil;
 
 import java.util.*;
+
+import static BasicStructure.ParserManager.buildTree;
+
 
 /**
  * Created by Jayvee on 2015/2/12.
@@ -64,24 +65,26 @@ public class StanfordUtils {
         Map<String, ArrayList<TypedDependency>> totalMap = new HashMap<String, ArrayList<TypedDependency>>(1);
         IDFCaculator idfCaculator = new IDFCaculator("Knowledge_Graph/data/IDF值.txt");
         ArrayList<WordNode> wordNodes = idfCaculator.CalTFIDF(text);
-        for (int i = 0; i < (1000<wordNodes.size()?1000:wordNodes.size()); i++) {
+        for (int i = 0; i < (1000 < wordNodes.size() ? 1000 : wordNodes.size()); i++) {
             WordNode wn = wordNodes.get(i);
             if (wn.getNature().contains("n")) {
 //            if (wn.getNature().equals("n")||wn.getNature().equals("nw")) {
 //            WordNode wn = wordNodes.get(i);
-            System.out.println(wn.getWord() + "\ttfidf=" + wn.tfidf + "\tnature=" + wn.getNature());
+                System.out.println(wn.getWord() + "\ttfidf=" + wn.tfidf + "\tnature=" + wn.getNature());
             }
         }
         ArrayList<ParserNode> totalROOT = new ArrayList<ParserNode>(0);
-        for (int i = 0; i < (100 < sentenceList.size() ? 100 : sentenceList.size()); i++) {
+//        for (int i = 0; i < (100 < sentenceList.size() ? 100 : sentenceList.size()); i++) {
+        for (int i = 0; i < sentenceList.size(); i++) {
             String sentence = sentenceList.get(i);
             System.out.println("正在处理第" + i + "个句子\n" + sentence);
             Tree parseTree = parseChinese(sentence);
-            ParserNode root = ParserNode.buildTree(parseTree.toString());
+            ParserNode root = buildTree(parseTree.toString());
             totalROOT.add(root);
             ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(parseTree);
             Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
-            Map<String, ArrayList<TypedDependency>> parserMapByTDs = buildParserMapByTDs(tds);
+            ParserManager pm = new ParserManager();
+            Map<String, ArrayList<TypedDependency>> parserMapByTDs = pm.buildParserMapByTDs(tds);
             //进行关系map的合并
             for (String rl : parserMapByTDs.keySet()) {
                 if (totalMap.get(rl) != null) {
@@ -98,33 +101,12 @@ public class StanfordUtils {
 //                System.out.println(parserMapByTDs.get("nn").get(0).gov().pennString());
 //            }
         }
-        System.out.println(totalMap.size()+"\t"+totalROOT.size());
+        System.out.println(totalMap.size() + "\t" + totalROOT.size());
 
 //        System.out.println(parserMapByTDs);
 //        System.out.println(parserMapByTDs.get("root").get(0).gov().pennString());
     }
 
-    /**
-     * 根据依赖关系列表创建树
-     *
-     * @param tds
-     */
-    public static Map<String, ArrayList<TypedDependency>> buildParserMapByTDs(Collection<TypedDependency> tds) {
-        Map<String, ArrayList<TypedDependency>> rlMap = new HashMap<String, ArrayList<TypedDependency>>(1);
-
-        for (TypedDependency td : tds) {
-            String longname = td.reln().getLongName();
-            String shortname = td.reln().getShortName();
-            if (rlMap.get(shortname) != null) {
-                rlMap.get(shortname).add(td);
-            } else {
-                ArrayList<TypedDependency> arrayList = new ArrayList<TypedDependency>(1);
-                arrayList.add(td);
-                rlMap.put(shortname, arrayList);
-            }
-        }
-        return rlMap;
-    }
 
 }
 
