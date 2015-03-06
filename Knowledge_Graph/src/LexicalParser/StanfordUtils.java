@@ -60,22 +60,29 @@ public class StanfordUtils {
     public static void main(String a[]) {
 //        String text = "何太冲是崆峒派的掌门人。";\
         SentencesUtil su = new SentencesUtil();
-        String text = FileUtils.File2str("Knowledge_Graph/data/倚天屠龙记.txt", "utf-8");
+        String text = FileUtils.File2str("Knowledge_Graph/data/sample.txt", "utf-8");
         List<String> sentenceList = su.toSentenceList(text);
-        Map<String, ArrayList<TypedDependency>> totalMap = new HashMap<String, ArrayList<TypedDependency>>(1);
+        Map<String, ArrayList<TypedDependency>> totalMap = new HashMap<String, ArrayList<TypedDependency>>(0);
         IDFCaculator idfCaculator = new IDFCaculator("Knowledge_Graph/data/IDF值.txt");
         ArrayList<WordNode> wordNodes = idfCaculator.CalTFIDF(text);
-        for (int i = 0; i < (1000 < wordNodes.size() ? 1000 : wordNodes.size()); i++) {
+        ParserManager pm = new ParserManager();
+//        for (int i = 0; i < (1000 < wordNodes.size() ? 1000 : wordNodes.size()); i++) {
+        System.out.println();
+        for (int i = 0; i < wordNodes.size(); i++) {
             WordNode wn = wordNodes.get(i);
-            if (wn.getNature().contains("n")) {
+            Map<String, Double> tfidf_map = pm.TFIDF_Map;
+            if (tfidf_map.get(wn.getWord()) == null) {
+                tfidf_map.put(wn.getWord(), wn.tfidf);
+            }
+//            if (wn.getNature().contains("nr")) {
 //            if (wn.getNature().equals("n")||wn.getNature().equals("nw")) {
 //            WordNode wn = wordNodes.get(i);
                 System.out.println(wn.getWord() + "\ttfidf=" + wn.tfidf + "\tnature=" + wn.getNature());
-            }
+//            }
         }
         ArrayList<ParserNode> totalROOT = new ArrayList<ParserNode>(0);
-//        for (int i = 0; i < (100 < sentenceList.size() ? 100 : sentenceList.size()); i++) {
-        for (int i = 0; i < sentenceList.size(); i++) {
+        for (int i = 0; i < (10 < sentenceList.size() ? 10 : sentenceList.size()); i++) {
+//        for (int i = 0; i < sentenceList.size(); i++) {
             String sentence = sentenceList.get(i);
             System.out.println("正在处理第" + i + "个句子\n" + sentence);
             Tree parseTree = parseChinese(sentence);
@@ -83,7 +90,6 @@ public class StanfordUtils {
             totalROOT.add(root);
             ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(parseTree);
             Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
-            ParserManager pm = new ParserManager();
             Map<String, ArrayList<TypedDependency>> parserMapByTDs = pm.buildParserMapByTDs(tds);
             //进行关系map的合并
             for (String rl : parserMapByTDs.keySet()) {
@@ -101,6 +107,7 @@ public class StanfordUtils {
 //                System.out.println(parserMapByTDs.get("nn").get(0).gov().pennString());
 //            }
         }
+        System.out.println(pm.getDepdMap().size() + "\t" + pm.getGovMap().size()+ "\t"+pm.TFIDF_Map.size());
         System.out.println(totalMap.size() + "\t" + totalROOT.size());
 
 //        System.out.println(parserMapByTDs);

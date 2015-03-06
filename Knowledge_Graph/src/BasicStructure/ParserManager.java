@@ -1,5 +1,6 @@
 package BasicStructure;
 
+import com.sun.javafx.collections.MappingChange;
 import edu.stanford.nlp.trees.TypedDependency;
 
 import java.util.*;
@@ -10,7 +11,30 @@ import java.util.*;
 public class ParserManager {
 
     public Map<String, Map<String, ArrayList<TypedDependency>>> GovMap;//以支配词作为key的map
+
     public Map<String, Map<String, ArrayList<TypedDependency>>> DepdMap;//以被支配词作为key的map
+
+    public Map<String, Map<String, ArrayList<TypedDependency>>> getGovMap() {
+        return GovMap;
+    }
+
+    public Map<String, Map<String, ArrayList<TypedDependency>>> getDepdMap() {
+        return DepdMap;
+    }
+
+    public Map<String, Double> TFIDF_Map;
+
+    //建立句子级的存储结构，包含句子的相关句法分析树、依赖树
+
+    public ParserManager() {
+        this.GovMap = new HashMap<String, Map<String, ArrayList<TypedDependency>>>(0);
+        this.DepdMap = new HashMap<String, Map<String, ArrayList<TypedDependency>>>(0);
+        this.TFIDF_Map = new HashMap<String, Double>(0);
+    }
+
+
+
+
 
 
     /**
@@ -18,8 +42,8 @@ public class ParserManager {
      *
      * @param tds
      */
-    public Map<String, ArrayList<TypedDependency>> buildParserMapByTDs(Collection<TypedDependency> tds) {
-        Map<String, ArrayList<TypedDependency>> rlMap = new HashMap<String, ArrayList<TypedDependency>>(1);
+    public Map<String, ArrayList<TypedDependency>> buildDependencyMapByTDs(Collection<TypedDependency> tds) {
+        Map<String, ArrayList<TypedDependency>> rlMap = new HashMap<String, ArrayList<TypedDependency>>(0);
 
         for (TypedDependency td : tds) {
             String longname = td.reln().getLongName();
@@ -34,9 +58,49 @@ public class ParserManager {
             //govmap的填充
             String govword = td.gov().value();
             if (GovMap.get(govword) != null) {
-//                Map<String >
-//                GovMap.put(govword,)
+                ArrayList<TypedDependency> govrln = GovMap.get(govword).get(td.reln().getShortName());
+                if (govrln != null) {
+                    govrln.add(td);
+                } else {
+//                    Map<String, ArrayList<TypedDependency>> govRelatMap
+//                            = new HashMap<String, ArrayList<TypedDependency>>(0);//支配词索引后以关系词为key的map
+                    ArrayList<TypedDependency> arr_govrln = new ArrayList<TypedDependency>(0);
+                    arr_govrln.add(td);
+                    GovMap.get(govword).put(td.reln().getShortName(), arr_govrln);
+//                    GovMap.get(govword).put(td.reln().getShortName(),td);
+                }
+            } else {
+                Map<String, ArrayList<TypedDependency>> govRelatMap
+                        = new HashMap<String, ArrayList<TypedDependency>>(0);//支配词索引后以关系词为key的map
+                ArrayList<TypedDependency> arr_govrln = new ArrayList<TypedDependency>(0);
+                arr_govrln.add(td);
+                govRelatMap.put(td.reln().getShortName(), arr_govrln);
+                GovMap.put(govword, govRelatMap);
             }
+
+            //depdmap的填充
+            String depdword = td.dep().value();
+            if (DepdMap.get(depdword) != null) {
+                ArrayList<TypedDependency> depdrln = DepdMap.get(depdword).get(td.reln().getShortName());
+                if (depdrln != null) {
+                    depdrln.add(td);
+                } else {
+//                    Map<String, ArrayList<TypedDependency>> govRelatMap
+//                            = new HashMap<String, ArrayList<TypedDependency>>(0);//支配词索引后以关系词为key的map
+                    ArrayList<TypedDependency> arr_depdrln = new ArrayList<TypedDependency>(0);
+                    arr_depdrln.add(td);
+                    DepdMap.get(depdword).put(td.reln().getShortName(), arr_depdrln);
+//                    GovMap.get(govword).put(td.reln().getShortName(),td);
+                }
+            } else {
+                Map<String, ArrayList<TypedDependency>> depdRelatMap
+                        = new HashMap<String, ArrayList<TypedDependency>>(0);//支配词索引后以关系词为key的map
+                ArrayList<TypedDependency> arr_depdrln = new ArrayList<TypedDependency>(0);
+                arr_depdrln.add(td);
+                depdRelatMap.put(td.reln().getShortName(), arr_depdrln);
+                DepdMap.put(depdword, depdRelatMap);
+            }
+
         }
         return rlMap;
     }
@@ -47,7 +111,7 @@ public class ParserManager {
      * @param text
      * @return
      */
-    public static ParserNode buildTree(String text) {
+    public static ParserNode buildParseTree(String text) {
         Stack<ParserNode> taskStack = new Stack<ParserNode>();
         ParserNode ROOT = null;
         int i = 0;

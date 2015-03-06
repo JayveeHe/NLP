@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 /**
+ * Stanford Parser解析后的自定义基本结点
  * Created by Jayvee on 2015/2/28.
  */
 public class ParserNode {
