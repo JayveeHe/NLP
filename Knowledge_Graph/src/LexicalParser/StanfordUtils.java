@@ -15,19 +15,17 @@ import org.nlpcn.commons.lang.standardization.SentencesUtil;
 
 import java.util.*;
 
-import static BasicStructure.ParserManager.buildTree;
 
 
 /**
  * Created by Jayvee on 2015/2/12.
  */
 public class StanfordUtils {
-    static String[] options = {"-MAX_ITEMS", "200000000"};
     static LexicalizedParser lp;
 
     static {
         String grammar = "Knowledge_Graph/data/chineseFactored.ser.gz";
-        String[] options = {"-maxLength", "50", "-MAX_ITEMS", "500000"};
+        String[] options = {"-maxLength", "50", "-MAX_ITEMS", "50000"};
         lp = LexicalizedParser.loadModel(grammar, options);
     }
 
@@ -39,22 +37,6 @@ public class StanfordUtils {
         }
         Tree parseTree = lp.parseStrings(lss);
         return parseTree;
-//        System.out.println(parseTree);
-//        ChineseTreebankLanguagePack tlp = new ChineseTreebankLanguagePack();
-//        GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
-//        ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(parseTree);
-//        Collection<TypedDependency> tdl = gs.typedDependenciesCollapsed();
-//        System.out.println(parseTree.yield());
-//        parseTree.pennPrint();
-//        Collection<TypedDependency> typedDependencies = gs.typedDependenciesCollapsedTree();
-//        for (TypedDependency td : tdl) {
-//            System.out.println(td.reln().getLongName()+td);
-//        }
-
-//        gs.getGrammaticalRelation(ChineseGrammaticalRelations.NOUN_MODIFIER, )
-//        GrammaticalStructure structure = gsf.newGrammaticalStructure(parseTree);
-//        System.out.println(typedDependencies);
-//        return tdl;
     }
 
     public static void main(String a[]) {
@@ -82,15 +64,15 @@ public class StanfordUtils {
         }
         ArrayList<ParserNode> totalROOT = new ArrayList<ParserNode>(0);
         for (int i = 0; i < (10 < sentenceList.size() ? 10 : sentenceList.size()); i++) {
-//        for (int i = 0; i < sentenceList.size(); i++) {
+//        for (int i = 0; i < sentenceNodes.size(); i++) {
             String sentence = sentenceList.get(i);
             System.out.println("正在处理第" + i + "个句子\n" + sentence);
             Tree parseTree = parseChinese(sentence);
-            ParserNode root = buildTree(parseTree.toString());
+            ParserNode root = ParserManager.buildParseTree(parseTree.toString());
             totalROOT.add(root);
             ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(parseTree);
             Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
-            Map<String, ArrayList<TypedDependency>> parserMapByTDs = pm.buildParserMapByTDs(tds);
+            Map<String, ArrayList<TypedDependency>> parserMapByTDs = pm.buildDependencyMapByTDs(tds);
             //进行关系map的合并
             for (String rl : parserMapByTDs.keySet()) {
                 if (totalMap.get(rl) != null) {
