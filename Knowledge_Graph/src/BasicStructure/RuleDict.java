@@ -1,15 +1,13 @@
 package BasicStructure;
 
 
-import FudanNLP.FudanUtils;
-import org.ansj.domain.Term;
-import org.ansj.splitWord.analysis.NlpAnalysis;
-import org.fnlp.nlp.parser.dep.DependencyTree;
+import LexicalParser.StanfordUtils;
+import edu.stanford.nlp.ling.WordTag;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TypedDependency;
+import edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jayvee on 2015/2/28.
@@ -38,6 +36,7 @@ public class RuleDict {
     public void analysis(DataManager dataManager) {
 //        for (int iter = 0; iter < ITER_MAX; iter++) {
         int dictCount = ruleList.size();
+        ArrayList<ParserManager> parserManagerList = new ArrayList<ParserManager>(0);
         do {//每一次迭代对ruledict的所有规则进行查询
             for (int i = 0; i < dictCount; i++) {
                 Rule rule = ruleList.get(i);
@@ -45,53 +44,203 @@ public class RuleDict {
                 List<String> sentences = dataManager.qury(coreWord);
                 if (sentences != null) {
                     for (String singleSentence : sentences) {
-                        DependencyTree dt = FudanUtils.parseText(singleSentence);
-//                        for()
-                        List<Term> terms = NlpAnalysis.parse(singleSentence);
-                        ArrayList<List<String>> lists = dt.toList();
+                        //Stanford
+                        ParserManager pm = new ParserManager(singleSentence);
+                        Tree tree = StanfordUtils.parseChinese(singleSentence);
+                        ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(tree);
+                        Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
+                        ParserManager.buildDependencyMapByTDs(tds);
+                        if (!parserManagerList.contains(pm)) {
+                            parserManagerList.add(pm);
+                        }
+                        //规则解析阶段
                         if (rule.isGov()) {
                             //如果触发词是支配词，则可以直接查找
-                            for (int j = 0; j < lists.size(); j++) {
-                                List<String> info = lists.get(j);
-                                if (info.get(0).equals(coreWord)
-                                        && info.get(3).equals(rule.getRelation())
-                                        && terms.get(j).getNatureStr().equals(rule.getTargetNature())
-                                        ) {
-                                    int toIndex = Integer.valueOf(info.get(2));
-                                    WordMark wordMark = new WordMark(lists.get(toIndex).get(0),
-                                            rule.getMark());
-                                    wordDict.put(lists.get(toIndex).get(0), wordMark);
+                            Map<String, ArrayList<TypedDependency>> relationMap = pm.sentenceNode.GovMap.get(rule.coreWord);
+                            for (ArrayList<TypedDependency> relationList : relationMap.values()) {
+                                for (TypedDependency td : relationList) {
+                                    String shortName = td.reln().getShortName();
+                                    if (shortName.equals(rule.getRelation())) {
+                                        String word = td.dep().value();
+                                        wordDict.put(word, new WordMark(word, rule.getMark()));
+                                    }
                                 }
                             }
                         } else {
                             //如果不是支配词，则遍历查找所有指向该点的词
-                            for (int j = 0; j < lists.size(); j++) {
-                                List<String> info = lists.get(j);
-                                if (
-                                        terms.get(j).getNatureStr().equals(rule.getTargetNature()) &&
-                                                info.get(3).equals(rule.getRelation())) {
-                                    String target = lists.get(Integer.valueOf(info.get(2))).get(0);
-                                    if (target.equals(rule.getCoreWord())) {
-                                        WordMark wordMark = new WordMark(info.get(0), rule.getMark());
-                                        wordDict.put(info.get(0), wordMark);
+                            Map<String, ArrayList<TypedDependency>> relationMap = pm.sentenceNode.DepdMap.get(rule.coreWord);
+                            for (ArrayList<TypedDependency> relationList : relationMap.values()) {
+                                for (TypedDependency td : relationList) {
+                                    String shortName = td.reln().getShortName();
+                                    if (shortName.equals(rule.getRelation())) {
+                                        String word = td.gov().value();
+                                        wordDict.put(word, new WordMark(word, rule.getMark()));
                                     }
+                                }
+                            }
+                        }
 
+
+//                        //Fudan
+//                        DependencyTree dt = FudanUtils.parseText(singleSentence);
+//                        List<Term> terms = NlpAnalysis.parse(singleSentence);
+//                        ArrayList<List<String>> lists = dt.toList();
+//                        //规则解析阶段
+//                        if (rule.isGov()) {
+//                            //如果触发词是支配词，则可以直接查找
+//                            for (int j = 0; j < lists.size(); j++) {
+//                                List<String> info = lists.get(j);
+//                                if (info.get(0).equals(coreWord)
+//                                        && info.get(3).equals(rule.getRelation())
+//                                        && terms.get(j).getNatureStr().equals(rule.getTargetNature())
+//                                        ) {
+//                                    int toIndex = Integer.valueOf(info.get(2));
+//                                    WordMark wordMark = new WordMark(lists.get(toIndex).get(0),
+//                                            rule.getMark());
+//                                    wordDict.put(lists.get(toIndex).get(0), wordMark);
+//                                }
+//                            }
+//                        } else {
+//                            //如果不是支配词，则遍历查找所有指向该点的词
+//                            for (int j = 0; j < lists.size(); j++) {
+//                                List<String> info = lists.get(j);
+//                                if (
+//                                        terms.get(j).getNatureStr().equals(rule.getTargetNature()) &&
+//                                                info.get(3).equals(rule.getRelation())) {
+//                                    String target = lists.get(Integer.valueOf(info.get(2))).get(0);
+//                                    if (target.equals(rule.getCoreWord())) {
+//                                        WordMark wordMark = new WordMark(info.get(0), rule.getMark());
+//                                        wordDict.put(info.get(0), wordMark);
+//                                    }
+//
+//                                }
+//                            }
+//                        }
+                    }
+                }
+//                System.out.println("第" + i + "个句子处理完毕");
+            }
+            //每轮迭代结束前进行规则词典的更新
+            System.out.println("正在更新规则……");
+            updateRules(dataManager, parserManagerList);
+            printDict();
+        } while (dictCount < ruleList.size());
+//        }
+//        System.out.println(wordDict.values());
+    }
+
+
+    public void printDict() {
+        StringBuilder sb = new StringBuilder();
+        for (WordMark wm : wordDict.values()) {
+            sb.append(wm + "\n");
+        }
+        System.out.println(sb);
+    }
+
+    /**
+     * 根据全局数据，对规则词典进行更新
+     */
+    private void updateRules(DataManager dataManager,
+                             ArrayList<ParserManager> parserManagerList) {
+        Map<String, List<String[]>> tempMap = new HashMap<String, List<String[]>>(0);
+        //key为mark，value[0]为候选触发词，value[1]为相应的关系，value[2]为是否支配词
+        for (WordMark wm : wordDict.values()) {
+            String mark = wm.getMark();//用于统计某一标记属性所对应的各词集合中，作为key
+            String word = wm.getWord();
+            for (ParserManager pm : parserManagerList) {
+                if (pm.sentenceNode.wordMap.containsKey(word)) {
+                    Map<String, Map<String, ArrayList<TypedDependency>>> govMap = pm.sentenceNode.GovMap;
+                    Map<String, Map<String, ArrayList<TypedDependency>>> depdMap = pm.sentenceNode.DepdMap;
+                    String[] key = new String[2];
+
+                    //key[0]为已有词典词，key[1]为触发词是否为支配词；
+                    //value里的String[0]为候选触发词，String[1]为触发词的关系
+                    Map<String, ArrayList<TypedDependency>> govRlnMap = govMap.get(word);
+                    if (govRlnMap != null) {
+                        String[] value = new String[4];
+                        key[0] = word;
+//                        key[1] = String.valueOf(false);
+                        for (ArrayList<TypedDependency> govList : govRlnMap.values()) {
+                            for (TypedDependency td : govList) {
+                                value[0] = td.dep().value();
+                                value[1] = td.reln().getShortName();
+                                value[2] = String.valueOf(false);
+                                value[3] = String.valueOf(1);
+                                if (tempMap.get(mark) != null) {
+                                    boolean isAdded = false;
+                                    for (String[] temp : tempMap.get(mark)) {
+                                        if (temp[0].equals(value[0]) && temp[1].equals(value[1]) && temp[2].equals(value[2])) {
+                                            temp[3] = String.valueOf(Integer.valueOf(temp[3]) + 1);//计数+1
+                                            isAdded = true;
+                                            break;
+                                        }
+//                                        else {
+//                                        }
+                                    }
+                                    if (!isAdded) {
+                                        tempMap.get(mark).add(value);
+                                    }
+                                } else {
+                                    List<String[]> templist = new ArrayList<String[]>(0);
+                                    templist.add(value);
+                                    tempMap.put(mark, templist);
+                                }
+                            }
+                        }
+                    }
+
+                    Map<String, ArrayList<TypedDependency>> depdRlnMap = depdMap.get(word);
+                    if (depdRlnMap != null) {
+                        String[] value = new String[4];
+                        key[0] = word;
+//                        key[1] = String.valueOf(false);
+                        for (ArrayList<TypedDependency> depdList : depdRlnMap.values()) {
+                            for (TypedDependency td : depdList) {
+                                value[0] = td.gov().value();
+                                value[1] = td.reln().getShortName();
+                                value[2] = String.valueOf(true);
+                                value[3] = String.valueOf(1);
+                                if (tempMap.get(mark) != null) {
+                                    boolean isAdded = false;
+                                    for (String[] temp : tempMap.get(mark)) {
+                                        if (temp[0].equals(value[0]) && temp[1].equals(value[1]) && temp[2].equals(value[2])) {
+                                            temp[3] = String.valueOf(Integer.valueOf(temp[3]) + 1);//计数+1
+                                            isAdded = true;
+                                            break;
+                                        }
+//                                        else {
+//                                        }
+                                    }
+                                    if (!isAdded) {
+                                        tempMap.get(mark).add(value);
+                                    }
+                                } else {
+                                    List<String[]> templist = new ArrayList<String[]>(0);
+                                    templist.add(value);
+                                    tempMap.put(mark, templist);
                                 }
                             }
                         }
                     }
                 }
-//                System.out.println("第" + i + "个句子处理完毕");
             }
-        } while (dictCount < ruleList.size());
-//        }
-        System.out.println(wordDict.values());
-    }
-
-
-    public void printDict() {
-        for (WordMark wm : wordDict.values()) {
-
+        }
+        //针对所有mark所连接的词进行排序
+        System.out.println(tempMap.size());
+        for (String key : tempMap.keySet()) {
+//            System.out.println(key);
+            int countMax = 0;
+            String[] wordtemp = null;
+            for (String[] value : tempMap.get(key)) {
+                if (Integer.valueOf(value[3]) > countMax) {
+                    wordtemp = value;
+                }
+            }
+            Rule tempRule = new Rule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
+            if (!ruleList.contains(tempRule))
+                addRule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
+//            RuleDict.Rule newrule = new Rule(wordtemp[0], )
         }
     }
 

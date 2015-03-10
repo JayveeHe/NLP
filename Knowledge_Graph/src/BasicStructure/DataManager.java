@@ -1,10 +1,11 @@
 package BasicStructure;
 
 import Utils.FileUtils;
+import Utils.IDFCaculator;
 import Utils.SegUtils;
+import Utils.WordNode;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.IndexAnalysis;
-import org.ansj.splitWord.analysis.NlpAnalysis;
 import org.nlpcn.commons.lang.standardization.SentencesUtil;
 
 import java.util.ArrayList;
@@ -18,13 +19,16 @@ import java.util.Map;
  */
 public class DataManager {
     private Map<String, List<Integer>> indexMap;
-    private List<SentenceNode> sentenceNodes;
+    //    private List<SentenceNode> sentenceNodes;
     private List<String> sentenceList;
+
+    public Map<String, Double> TFIDF_Map;
 
     public DataManager() {
         this.indexMap = new HashMap<String, List<Integer>>(0);
-        this.sentenceNodes = new ArrayList<SentenceNode>(0);
+//        this.sentenceNodes = new ArrayList<SentenceNode>(0);
         this.sentenceList = new ArrayList<String>(0);
+        this.TFIDF_Map = new HashMap<String, Double>(0);
     }
 
     public void addSentence(String sentence) {
@@ -37,7 +41,9 @@ public class DataManager {
         //添加索引
         for (Term term : terms) {
             if (indexMap.get(term.getName()) != null) {
-                indexMap.get(term.getName()).add(index);
+                if (!indexMap.get(term.getName()).contains(index)) {
+                    indexMap.get(term.getName()).add(index);
+                }
             } else {
                 ArrayList<Integer> templist = new ArrayList<Integer>(0);
                 templist.add(index);
@@ -79,13 +85,22 @@ public class DataManager {
      * @param filepath
      */
     public void loadFile(String filepath) {
-        SentencesUtil su = new SentencesUtil();
         String text = FileUtils.File2str(filepath, "utf-8");
+        //首先针对全文进行tfidf计算
+        IDFCaculator idfCaculator = new IDFCaculator("Knowledge_Graph/data/IDF值.txt");
+        ArrayList<WordNode> wordNodes = idfCaculator.CalTFIDF(text);
+        for (WordNode wn : wordNodes) {
+//            double temp = wn.tfidf;
+            TFIDF_Map.put(wn.getWord(), wn.tfidf);
+//            if()
+//            TFIDF_Map
+        }
+        SentencesUtil su = new SentencesUtil();
         List<String> sentenceList = su.toSentenceList(text);
 //        DataManager dm = new DataManager();
         int i = 0;
         for (String sentence : sentenceList) {
-            if (sentence.length() > 100) {
+            if (sentence.length() > 50) {
                 String[] split = sentence.split("，");
                 for (String s : split) {
                     addSentence(s);
