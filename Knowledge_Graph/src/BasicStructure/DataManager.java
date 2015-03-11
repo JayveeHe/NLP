@@ -89,6 +89,7 @@ public class DataManager {
         //首先针对全文进行tfidf计算
         IDFCaculator idfCaculator = new IDFCaculator("Knowledge_Graph/data/IDF值.txt");
         ArrayList<WordNode> wordNodes = idfCaculator.CalTFIDF(text);
+        TFIDF_Map.put("ROOT",0.0);
         for (WordNode wn : wordNodes) {
 //            double temp = wn.tfidf;
             TFIDF_Map.put(wn.getWord(), wn.tfidf);

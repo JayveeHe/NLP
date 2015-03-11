@@ -38,6 +38,7 @@ public class RuleDict {
         int dictCount = ruleList.size();
         ArrayList<ParserManager> parserManagerList = new ArrayList<ParserManager>(0);
         do {//每一次迭代对ruledict的所有规则进行查询
+            dictCount = ruleList.size();
             for (int i = 0; i < dictCount; i++) {
                 Rule rule = ruleList.get(i);
                 String coreWord = rule.getCoreWord();
@@ -144,10 +145,21 @@ public class RuleDict {
     private void updateRules(DataManager dataManager,
                              ArrayList<ParserManager> parserManagerList) {
         Map<String, List<String[]>> tempMap = new HashMap<String, List<String[]>>(0);
+        if (parserManagerList.size() < 1) {
+            for (WordMark wm : wordDict.values()) {
+                String tempword = wm.getWord();
+                List<String> qury = dataManager.qury(tempword);
+                for (String s : qury) {
+                    ParserManager ppp = new ParserManager(s);
+                    parserManagerList.add(ppp);
+                }
+            }
+        }
         //key为mark，value[0]为候选触发词，value[1]为相应的关系，value[2]为是否支配词
         for (WordMark wm : wordDict.values()) {
             String mark = wm.getMark();//用于统计某一标记属性所对应的各词集合中，作为key
             String word = wm.getWord();
+
             for (ParserManager pm : parserManagerList) {
                 if (pm.sentenceNode.wordMap.containsKey(word)) {
                     Map<String, Map<String, ArrayList<TypedDependency>>> govMap = pm.sentenceNode.GovMap;
@@ -226,20 +238,27 @@ public class RuleDict {
                 }
             }
         }
-        //针对所有mark所连接的词进行排序
+//针对所有mark所连接的词进行排序
         System.out.println(tempMap.size());
         for (String key : tempMap.keySet()) {
 //            System.out.println(key);
-            int countMax = 0;
+            double countMax = 0;
             String[] wordtemp = null;
+//            int t = 0;
             for (String[] value : tempMap.get(key)) {
-                if (Integer.valueOf(value[3]) > countMax) {
-                    wordtemp = value;
+                if (!value[0].equals("ROOT")) {
+                    Double tfidf = dataManager.TFIDF_Map.get(value[0]);
+//                System.out.println(t++);
+                    if (Integer.valueOf(value[3]) * tfidf > countMax) {
+                        countMax = Integer.valueOf(value[3]) * tfidf;
+                        wordtemp = value;
+                    }
                 }
             }
             Rule tempRule = new Rule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
             if (!ruleList.contains(tempRule))
                 addRule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
+            System.out.println("增加的规则：" + tempRule);
 //            RuleDict.Rule newrule = new Rule(wordtemp[0], )
         }
     }
@@ -265,7 +284,7 @@ public class RuleDict {
 
         @Override
         public String toString() {
-            return "实体:" + word + "\t类别：" + mark;
+            return "实体:" + word + "\t类别：" + mark + "\t";
         }
     }
 
@@ -303,6 +322,21 @@ public class RuleDict {
 
         public String getTargetNature() {
             return targetNature;
+        }
+
+        @Override
+        public String toString() {
+            return coreWord + "\t" + relation + "\t" + mark + "\t";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Rule) {
+                return ((Rule) obj).getCoreWord().equals(this.coreWord)
+                        && ((Rule) obj).getMark().equals(this.mark)
+                        && ((Rule) obj).getRelation().equals(this.relation)
+                        && ((Rule) obj).getTargetNature().equals(this.targetNature);
+            } else return false;
         }
     }
 }
