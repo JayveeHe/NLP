@@ -245,6 +245,7 @@ public class RuleDict {
             double countMax = 0;
             String[] wordtemp = null;
 //            int t = 0;
+            List<String[]> templist = new ArrayList<String[]>(0);
             for (String[] value : tempMap.get(key)) {
                 if (!value[0].equals("ROOT")) {
                     Double tfidf = dataManager.TFIDF_Map.get(value[0]);
@@ -326,7 +327,7 @@ public class RuleDict {
 
         @Override
         public String toString() {
-            return coreWord + "\t" + relation + "\t" + mark + "\t";
+            return coreWord + "\t" + relation + "\t" + mark + "\t"+isGov+"\t";
         }
 
         @Override
