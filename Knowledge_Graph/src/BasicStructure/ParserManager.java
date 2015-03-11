@@ -265,6 +265,15 @@ public class ParserManager {
         return ROOT;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ParserManager){
+            return ((ParserManager) obj).text.equals(this.text);
+        }else{
+            return false;
+        }
+    }
+
     class RelationNode {
         String govWord;
         String depdWord;

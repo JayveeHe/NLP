@@ -58,24 +58,28 @@ public class RuleDict {
                         if (rule.isGov()) {
                             //如果触发词是支配词，则可以直接查找
                             Map<String, ArrayList<TypedDependency>> relationMap = pm.sentenceNode.GovMap.get(rule.coreWord);
-                            for (ArrayList<TypedDependency> relationList : relationMap.values()) {
-                                for (TypedDependency td : relationList) {
-                                    String shortName = td.reln().getShortName();
-                                    if (shortName.equals(rule.getRelation())) {
-                                        String word = td.dep().value();
-                                        wordDict.put(word, new WordMark(word, rule.getMark()));
+                            if (relationMap != null) {
+                                for (ArrayList<TypedDependency> relationList : relationMap.values()) {
+                                    for (TypedDependency td : relationList) {
+                                        String shortName = td.reln().getShortName();
+                                        if (shortName.equals(rule.getRelation())) {
+                                            String word = td.dep().value();
+                                            wordDict.put(word, new WordMark(word, rule.getMark()));
+                                        }
                                     }
                                 }
                             }
                         } else {
                             //如果不是支配词，则遍历查找所有指向该点的词
                             Map<String, ArrayList<TypedDependency>> relationMap = pm.sentenceNode.DepdMap.get(rule.coreWord);
-                            for (ArrayList<TypedDependency> relationList : relationMap.values()) {
-                                for (TypedDependency td : relationList) {
-                                    String shortName = td.reln().getShortName();
-                                    if (shortName.equals(rule.getRelation())) {
-                                        String word = td.gov().value();
-                                        wordDict.put(word, new WordMark(word, rule.getMark()));
+                            if (relationMap != null) {
+                                for (ArrayList<TypedDependency> relationList : relationMap.values()) {
+                                    for (TypedDependency td : relationList) {
+                                        String shortName = td.reln().getShortName();
+                                        if (shortName.equals(rule.getRelation())) {
+                                            String word = td.gov().value();
+                                            wordDict.put(word, new WordMark(word, rule.getMark()));
+                                        }
                                     }
                                 }
                             }
@@ -149,9 +153,11 @@ public class RuleDict {
             for (WordMark wm : wordDict.values()) {
                 String tempword = wm.getWord();
                 List<String> qury = dataManager.qury(tempword);
-                for (String s : qury) {
-                    ParserManager ppp = new ParserManager(s);
-                    parserManagerList.add(ppp);
+                if (qury != null) {
+                    for (String s : qury) {
+                        ParserManager ppp = new ParserManager(s);
+                        parserManagerList.add(ppp);
+                    }
                 }
             }
         }
@@ -250,16 +256,17 @@ public class RuleDict {
                 if (!value[0].equals("ROOT")) {
                     Double tfidf = dataManager.TFIDF_Map.get(value[0]);
 //                System.out.println(t++);
-                    if (Integer.valueOf(value[3]) * tfidf > countMax) {
+                    if (Integer.valueOf(value[3]) * tfidf >= countMax) {
                         countMax = Integer.valueOf(value[3]) * tfidf;
                         wordtemp = value;
                     }
                 }
             }
             Rule tempRule = new Rule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
-            if (!ruleList.contains(tempRule))
+            if (!ruleList.contains(tempRule)) {
                 addRule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
-            System.out.println("增加的规则：" + tempRule);
+                System.out.println("增加的规则：" + tempRule);
+            }
 //            RuleDict.Rule newrule = new Rule(wordtemp[0], )
         }
     }
@@ -327,7 +334,7 @@ public class RuleDict {
 
         @Override
         public String toString() {
-            return coreWord + "\t" + relation + "\t" + mark + "\t"+isGov+"\t";
+            return coreWord + "\t" + relation + "\t" + mark + "\t" + isGov + "\t";
         }
 
         @Override
