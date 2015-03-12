@@ -176,7 +176,7 @@ public class RuleDict {
                     //value里的String[0]为候选触发词，String[1]为触发词的关系
                     Map<String, ArrayList<TypedDependency>> govRlnMap = govMap.get(word);
                     if (govRlnMap != null) {
-                        String[] value = new String[4];
+                        String[] value = new String[5];
                         key[0] = word;
 //                        key[1] = String.valueOf(false);
                         for (ArrayList<TypedDependency> govList : govRlnMap.values()) {
@@ -185,6 +185,7 @@ public class RuleDict {
                                 value[1] = td.reln().getShortName();
                                 value[2] = String.valueOf(false);
                                 value[3] = String.valueOf(1);
+                                value[4]  = pm.sentenceNode.natures[td.dep().index()];
                                 if (tempMap.get(mark) != null) {
                                     boolean isAdded = false;
                                     for (String[] temp : tempMap.get(mark)) {
@@ -210,7 +211,7 @@ public class RuleDict {
 
                     Map<String, ArrayList<TypedDependency>> depdRlnMap = depdMap.get(word);
                     if (depdRlnMap != null) {
-                        String[] value = new String[4];
+                        String[] value = new String[5];
                         key[0] = word;
 //                        key[1] = String.valueOf(false);
                         for (ArrayList<TypedDependency> depdList : depdRlnMap.values()) {
@@ -219,6 +220,7 @@ public class RuleDict {
                                 value[1] = td.reln().getShortName();
                                 value[2] = String.valueOf(true);
                                 value[3] = String.valueOf(1);
+                                value[4]  = pm.sentenceNode.natures[td.gov().index()];
                                 if (tempMap.get(mark) != null) {
                                     boolean isAdded = false;
                                     for (String[] temp : tempMap.get(mark)) {
@@ -253,18 +255,20 @@ public class RuleDict {
 //            int t = 0;
             List<String[]> templist = new ArrayList<String[]>(0);
             for (String[] value : tempMap.get(key)) {
-                if (!value[0].equals("ROOT")) {
-                    Double tfidf = dataManager.TFIDF_Map.get(value[0]);
+                Double tfidf = dataManager.TFIDF_Map.get(value[0]);
+                if (tfidf != null) {
+//                    if (!value[0].equals("ROOT")) {
 //                System.out.println(t++);
                     if (Integer.valueOf(value[3]) * tfidf >= countMax) {
                         countMax = Integer.valueOf(value[3]) * tfidf;
                         wordtemp = value;
                     }
+//                    }
                 }
             }
             Rule tempRule = new Rule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
             if (!ruleList.contains(tempRule)) {
-                addRule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
+                addRule(wordtemp[0], wordtemp[1], wordtemp[4], Boolean.valueOf(wordtemp[2]), key);
                 System.out.println("增加的规则：" + tempRule);
             }
 //            RuleDict.Rule newrule = new Rule(wordtemp[0], )
@@ -334,7 +338,7 @@ public class RuleDict {
 
         @Override
         public String toString() {
-            return coreWord + "\t" + relation + "\t" + mark + "\t" + isGov + "\t";
+            return "触发词:"+coreWord + "\t触发关系：" + relation +"\t触发词词性："+targetNature +"\t是否支配:" + isGov + "\t标注类型：" + mark ;
         }
 
         @Override
