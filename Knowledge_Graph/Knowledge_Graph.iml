@@ -12,6 +12,7 @@
     <orderEntry type="library" name="lucene-core-5.0.0" level="project" />
     <orderEntry type="library" name="libs" level="project" />
     <orderEntry type="library" name="ansj_seg-2.0.6" level="project" />
+    <orderEntry type="library" name="stdlib" level="project" />
   </component>
 </module>
 

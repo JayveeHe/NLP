@@ -35,11 +35,14 @@ public class RuleDict {
 
     public void analysis(DataManager dataManager) {
 //        for (int iter = 0; iter < ITER_MAX; iter++) {
+        int MAX_ITER = 3;
         int dictCount = ruleList.size();
+        int startIndex = 0;
         ArrayList<ParserManager> parserManagerList = new ArrayList<ParserManager>(0);
         do {//每一次迭代对ruledict的所有规则进行查询
             dictCount = ruleList.size();
-            for (int i = 0; i < dictCount; i++) {
+//            for (int i = 0; i < ruleList.size(); i++) {
+            for (int i = startIndex; i < ruleList.size(); i++) {//已经检测过的rule就不再检测了
                 Rule rule = ruleList.get(i);
                 String coreWord = rule.getCoreWord();
                 List<String> sentences = dataManager.qury(coreWord);
@@ -64,7 +67,11 @@ public class RuleDict {
                                         String shortName = td.reln().getShortName();
                                         if (shortName.equals(rule.getRelation())) {
                                             String word = td.dep().value();
-                                            wordDict.put(word, new WordMark(word, rule.getMark()));
+                                            if (pm.sentenceNode.natures[td.dep().index()].contains("n")) {
+                                                WordMark wordMark = new WordMark(word, rule.getMark());
+                                                wordDict.put(word, wordMark);
+                                                System.out.println("【发现实体】由  " + rule + "  推出的新实体：" + wordMark);
+                                            }
                                         }
                                     }
                                 }
@@ -78,7 +85,11 @@ public class RuleDict {
                                         String shortName = td.reln().getShortName();
                                         if (shortName.equals(rule.getRelation())) {
                                             String word = td.gov().value();
-                                            wordDict.put(word, new WordMark(word, rule.getMark()));
+                                            if (pm.sentenceNode.natures[td.gov().index()].contains("n")) {
+                                                WordMark wordMark = new WordMark(word, rule.getMark());
+                                                wordDict.put(word, wordMark);
+                                                System.out.println("【发现实体】由  " + rule + "  推出的新实体：" + wordMark);
+                                            }
                                         }
                                     }
                                 }
@@ -127,8 +138,14 @@ public class RuleDict {
             }
             //每轮迭代结束前进行规则词典的更新
             System.out.println("正在更新规则……");
+            //清空已处理的rule
+//            clearRules();
+            startIndex = ruleList.size();//防止规则的重复检测
             updateRules(dataManager, parserManagerList);
             printDict();
+//            if(dictCount == wordDict.size()){
+//                MAX_ITER--;
+//            }
         } while (dictCount < ruleList.size());
 //        }
 //        System.out.println(wordDict.values());
@@ -136,7 +153,7 @@ public class RuleDict {
 
 
     public void printDict() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("现在词典中共有" + (wordDict.size() + 1) + "个实体");
         for (WordMark wm : wordDict.values()) {
             sb.append(wm + "\n");
         }
@@ -185,7 +202,7 @@ public class RuleDict {
                                 value[1] = td.reln().getShortName();
                                 value[2] = String.valueOf(false);
                                 value[3] = String.valueOf(1);
-                                value[4]  = pm.sentenceNode.natures[td.dep().index()];
+                                value[4] = pm.sentenceNode.natures[td.dep().index()];
                                 if (tempMap.get(mark) != null) {
                                     boolean isAdded = false;
                                     for (String[] temp : tempMap.get(mark)) {
@@ -220,7 +237,7 @@ public class RuleDict {
                                 value[1] = td.reln().getShortName();
                                 value[2] = String.valueOf(true);
                                 value[3] = String.valueOf(1);
-                                value[4]  = pm.sentenceNode.natures[td.gov().index()];
+                                value[4] = pm.sentenceNode.natures[td.gov().index()];
                                 if (tempMap.get(mark) != null) {
                                     boolean isAdded = false;
                                     for (String[] temp : tempMap.get(mark)) {
@@ -247,34 +264,46 @@ public class RuleDict {
             }
         }
 //针对所有mark所连接的词进行排序
-        System.out.println(tempMap.size());
+//        System.out.println(tempMap.size());
         for (String key : tempMap.keySet()) {
 //            System.out.println(key);
             double countMax = 0;
             String[] wordtemp = null;
 //            int t = 0;
-            List<String[]> templist = new ArrayList<String[]>(0);
+//            List<String[]> templist = new ArrayList<String[]>(0);
+            Rule tempRule = null;
             for (String[] value : tempMap.get(key)) {
                 Double tfidf = dataManager.TFIDF_Map.get(value[0]);
                 if (tfidf != null) {
 //                    if (!value[0].equals("ROOT")) {
 //                System.out.println(t++);
-                    if (Integer.valueOf(value[3]) * tfidf >= countMax) {
+                    tempRule = new Rule(value[0], value[1], value[4], Boolean.valueOf(value[2]), key);
+
+                    if (Integer.valueOf(value[3]) * tfidf >= countMax
+                            && !ruleList.contains(tempRule)
+                            && (value[4].contains("v") || value[4].contains("n"))) {
                         countMax = Integer.valueOf(value[3]) * tfidf;
                         wordtemp = value;
                     }
 //                    }
                 }
             }
-            Rule tempRule = new Rule(wordtemp[0], wordtemp[1], "n", Boolean.valueOf(wordtemp[2]), key);
-            if (!ruleList.contains(tempRule)) {
-                addRule(wordtemp[0], wordtemp[1], wordtemp[4], Boolean.valueOf(wordtemp[2]), key);
-                System.out.println("增加的规则：" + tempRule);
+
+            if (wordtemp != null) {
+                tempRule = new Rule(wordtemp[0], wordtemp[1], wordtemp[4], Boolean.valueOf(wordtemp[2]), key);
+                if (!ruleList.contains(tempRule)) {
+                    addRule(wordtemp[0], wordtemp[1], wordtemp[4], Boolean.valueOf(wordtemp[2]), key);
+                    System.out.println("【新增规则】增加的规则：" + tempRule);
+                }
             }
 //            RuleDict.Rule newrule = new Rule(wordtemp[0], )
         }
     }
 
+
+    private void clearRules() {
+        this.ruleList.clear();
+    }
 
     private class WordMark {
         private final String word;
@@ -296,7 +325,7 @@ public class RuleDict {
 
         @Override
         public String toString() {
-            return "实体:" + word + "\t类别：" + mark + "\t";
+            return "实体： " + word + "\t类别： " + mark + "\t";
         }
     }
 
@@ -338,7 +367,7 @@ public class RuleDict {
 
         @Override
         public String toString() {
-            return "触发词:"+coreWord + "\t触发关系：" + relation +"\t触发词词性："+targetNature +"\t是否支配:" + isGov + "\t标注类型：" + mark ;
+            return "触发词： " + coreWord + "\t触发关系： " + relation + "\t触发词词性： " + targetNature + "\t是否支配： " + isGov + "\t标注类型： " + mark;
         }
 
         @Override

@@ -38,7 +38,7 @@ public class SentenceNode {
         this.GovMap = new HashMap<String, Map<String, ArrayList<TypedDependency>>>(0);
         this.DepdMap = new HashMap<String, Map<String, ArrayList<TypedDependency>>>(0);
         Tree tree = StanfordUtils.parseChinese(text);
-        this.ParseTree = ParserManager.buildParseTree(tree.toString());
+//        this.ParseTree = ParserManager.buildParseTree(tree.toString());
         ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(tree);
         Collection<TypedDependency> tds = gs.typedDependenciesCollapsed();
         this.ParseMap = ParserManager.buildDependencyMap(tds, GovMap, DepdMap);
