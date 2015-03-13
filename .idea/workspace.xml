@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a6b00d9b-3143-4684-bb1a-9f574fd43196" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Knowledge_Graph/data/reduce.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Knowledge_Graph/Knowledge_Graph.iml" afterPath="$PROJECT_DIR$/Knowledge_Graph/Knowledge_Graph.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NLP.iml" afterPath="$PROJECT_DIR$/NLP.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Knowledge_Graph/src/BasicStructure/RuleDict.java" afterPath="$PROJECT_DIR$/Knowledge_Graph/src/BasicStructure/RuleDict.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Knowledge_Graph/src/BasicStructure/SentenceNode.java" afterPath="$PROJECT_DIR$/Knowledge_Graph/src/BasicStructure/SentenceNode.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MOVED" beforePath="D:\CS\Git\NLP\.idea\libraries\Knowledge_Graph.xml" afterPath="$PROJECT_DIR$/.idea/libraries/commons_cli_1_2.xml" />
     </list>
     <list id="a1d4ae10-1758-4312-9e53-e78877fd8a50" name="Failed commit: Default" comment="1、完成多观察序列的模型训练函数；&#10;2、引入字典树结构，完成词汇到序号的映射函数；&#10;3、完成模型参数的本地文件存储与读取功能&#10;4、优化工程目录结构" />
     <ignored path="NLP.iws" />
@@ -70,20 +64,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="firstTest.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="firstTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Knowledge_Graph/src/TestDemos/firstTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1297" max-vertical-offset="1995">
+            <state vertical-scroll-proportion="-1.7061856" vertical-offset="1738" max-vertical-offset="1995">
               <caret line="81" column="21" selection-start-line="81" selection-start-column="21" selection-end-line="81" selection-end-column="21" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RuleDict.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RuleDict.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Knowledge_Graph/src/BasicStructure/RuleDict.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.35051546" vertical-offset="7219" max-vertical-offset="7770">
+            <state vertical-scroll-proportion="0.0" vertical-offset="7219" max-vertical-offset="7770">
               <caret line="369" column="123" selection-start-line="369" selection-start-column="123" selection-end-line="369" selection-end-column="123" />
               <folding>
                 <element signature="e#456#474#0" expanded="true" />
@@ -662,7 +656,7 @@
       <workItem from="1425957720855" duration="9563000" />
       <workItem from="1426086560125" duration="2618000" />
       <workItem from="1426150202055" duration="514000" />
-      <workItem from="1426151109526" duration="15444000" />
+      <workItem from="1426151109526" duration="15738000" />
     </task>
     <task id="LOCAL-00001" summary="添加后向向量类">
       <created>1415716496176</created>
@@ -696,11 +690,15 @@
       <created>1426045905835</created>
       <updated>1426045905835</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="RuleDict类已可以实际检验">
+      <created>1426180337179</created>
+      <updated>1426180337179</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="342172000" />
+    <option name="totallyTimeSpent" value="342466000" />
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -724,7 +722,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32894737" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -743,7 +741,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928678" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21320182" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21320182" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.56578946" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -803,7 +801,8 @@
     <MESSAGE value="1、去除训练函数中对SigmaVector和GammaVector的多余构造，将calGamma函数放入SigmaVector类中。&#10;2、添加索引词典的处理函数。&#10;3、修改WordIndex的一个内部类。&#10;4、整合一些小功能" />
     <MESSAGE value="1、加入BigDecimal和开源的BigDecimalMath包，进行高精度计算。&#10;2、修改训练函数的细节，进入实验阶段" />
     <MESSAGE value="继续修改ruledict类" />
-    <option name="LAST_COMMIT_MESSAGE" value="继续修改ruledict类" />
+    <MESSAGE value="RuleDict类已可以实际检验" />
+    <option name="LAST_COMMIT_MESSAGE" value="RuleDict类已可以实际检验" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1218,14 +1217,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Knowledge_Graph/src/TestDemos/firstTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1297" max-vertical-offset="1995">
-          <caret line="81" column="21" selection-start-line="81" selection-start-column="21" selection-end-line="81" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Knowledge_Graph/data/sample.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="315">
@@ -1236,7 +1227,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Knowledge_Graph/src/BasicStructure/RuleDict.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35051546" vertical-offset="7219" max-vertical-offset="7770">
+        <state vertical-scroll-proportion="0.0" vertical-offset="7219" max-vertical-offset="7770">
           <caret line="369" column="123" selection-start-line="369" selection-start-column="123" selection-end-line="369" selection-end-column="123" />
           <folding>
             <element signature="e#456#474#0" expanded="true" />
@@ -1244,6 +1235,14 @@
             <element signature="e#15246#15247#0" expanded="true" />
             <element signature="e#15283#15284#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Knowledge_Graph/src/TestDemos/firstTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.7061856" vertical-offset="1738" max-vertical-offset="1995">
+          <caret line="81" column="21" selection-start-line="81" selection-start-column="21" selection-end-line="81" selection-end-column="21" />
+          <folding />
         </state>
       </provider>
     </entry>
