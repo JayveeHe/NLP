@@ -263,29 +263,21 @@ public class RuleDict {
                 }
             }
         }
-//针对所有mark所连接的词进行排序
-//        System.out.println(tempMap.size());
+//          针对所有mark所连接的词进行排序
         for (String key : tempMap.keySet()) {
-//            System.out.println(key);
             double countMax = 0;
             String[] wordtemp = null;
-//            int t = 0;
-//            List<String[]> templist = new ArrayList<String[]>(0);
             Rule tempRule = null;
             for (String[] value : tempMap.get(key)) {
                 Double tfidf = dataManager.TFIDF_Map.get(value[0]);
                 if (tfidf != null) {
-//                    if (!value[0].equals("ROOT")) {
-//                System.out.println(t++);
                     tempRule = new Rule(value[0], value[1], value[4], Boolean.valueOf(value[2]), key);
-
                     if (Integer.valueOf(value[3]) * tfidf >= countMax
                             && !ruleList.contains(tempRule)
                             && (value[4].contains("v") || value[4].contains("n"))) {
                         countMax = Integer.valueOf(value[3]) * tfidf;
                         wordtemp = value;
                     }
-//                    }
                 }
             }
 
@@ -372,12 +364,11 @@ public class RuleDict {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof Rule) {
-                return ((Rule) obj).getCoreWord().equals(this.coreWord)
-                        && ((Rule) obj).getMark().equals(this.mark)
-                        && ((Rule) obj).getRelation().equals(this.relation)
-                        && ((Rule) obj).getTargetNature().equals(this.targetNature);
-            } else return false;
+            return obj instanceof Rule
+                    && ((Rule) obj).getCoreWord().equals(this.coreWord)
+                    && ((Rule) obj).getMark().equals(this.mark)
+                    && ((Rule) obj).getRelation().equals(this.relation)
+                    && ((Rule) obj).getTargetNature().equals(this.targetNature);
         }
     }
 }

@@ -6,6 +6,7 @@ import Utils.SegUtils;
 import Utils.WordNode;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.IndexAnalysis;
+import org.ansj.util.MyStaticValue;
 import org.nlpcn.commons.lang.standardization.SentencesUtil;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class DataManager {
     public Map<String, Double> TFIDF_Map;
 
     public DataManager() {
+        MyStaticValue.userLibrary = "./Knowledge_Graph/seg_dict/myDict.dic";
         this.indexMap = new HashMap<String, List<Integer>>(0);
 //        this.sentenceNodes = new ArrayList<SentenceNode>(0);
         this.sentenceList = new ArrayList<String>(0);
