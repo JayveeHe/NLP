@@ -25,7 +25,7 @@ public class StanfordUtils {
 
     static {
         String grammar = "Knowledge_Graph/data/chineseFactored.ser.gz";
-        String[] options = {"-maxLength", "60", "-MAX_ITEMS", "100000"};
+        String[] options = {"-maxLength", "60", "-MAX_ITEMS", "50000"};
         lp = LexicalizedParser.loadModel(grammar, options);
     }
 

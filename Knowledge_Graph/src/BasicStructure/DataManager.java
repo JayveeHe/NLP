@@ -104,7 +104,8 @@ public class DataManager {
         int i = 0;
         for (String sentence : sentenceList) {
             if (sentence.length() > 50) {
-                String[] split = sentence.split("，");
+                System.out.println("分割句子:\n"+sentence);
+                String[] split = sentence.split(",|，");
                 for (String s : split) {
                     addSentence(s);
                 }

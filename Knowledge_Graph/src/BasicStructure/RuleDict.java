@@ -2,10 +2,12 @@ package BasicStructure;
 
 
 import LexicalParser.StanfordUtils;
+import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.WordTag;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure;
+import org.ansj.library.UserDefineLibrary;
 
 import java.util.*;
 
@@ -34,6 +36,10 @@ public class RuleDict {
     }
 
     public void analysis(DataManager dataManager) {
+        //将wordDict中的词加入分词词典中
+        for (String word:wordDict.keySet()){
+            UserDefineLibrary.insertWord(word,"nw", 1000);
+        }
 //        for (int iter = 0; iter < ITER_MAX; iter++) {
         int MAX_ITER = 3;
         int dictCount = ruleList.size();
@@ -67,10 +73,12 @@ public class RuleDict {
                                         String shortName = td.reln().getShortName();
                                         if (shortName.equals(rule.getRelation())) {
                                             String word = td.dep().value();
-                                            if (pm.sentenceNode.natures[td.dep().index()].contains("n")) {
-                                                WordMark wordMark = new WordMark(word, rule.getMark());
-                                                wordDict.put(word, wordMark);
-                                                System.out.println("【发现实体】由  " + rule + "  推出的新实体：" + wordMark);
+                                            if (!wordDict.containsKey(word)) {
+                                                if (pm.sentenceNode.natures[td.dep().index()].contains("n")) {
+                                                    WordMark wordMark = new WordMark(word, rule.getMark());
+                                                    wordDict.put(word, wordMark);
+                                                    System.out.println("【发现实体】由  " + rule + "  推出的新实体：" + wordMark);
+                                                }
                                             }
                                         }
                                     }
@@ -85,11 +93,13 @@ public class RuleDict {
                                         String shortName = td.reln().getShortName();
                                         if (shortName.equals(rule.getRelation())) {
                                             String word = td.gov().value();
-                                            if (pm.sentenceNode.natures[td.gov().index()].contains("n")) {
-                                                WordMark wordMark = new WordMark(word, rule.getMark());
-                                                wordDict.put(word, wordMark);
-                                                System.out.println("【发现实体】由  " + rule + "  推出的新实体：" + wordMark);
-                                            }
+                                            if (!wordDict.containsKey(word))
+                                                if (pm.sentenceNode.natures[td.gov().index()].contains("n")) {
+
+                                                    WordMark wordMark = new WordMark(word, rule.getMark());
+                                                    wordDict.put(word, wordMark);
+                                                    System.out.println("【发现实体】由  " + rule + "  推出的新实体：" + wordMark);
+                                                }
                                         }
                                     }
                                 }
@@ -153,7 +163,7 @@ public class RuleDict {
 
 
     public void printDict() {
-        StringBuilder sb = new StringBuilder("现在词典中共有" + (wordDict.size() + 1) + "个实体");
+        StringBuilder sb = new StringBuilder("现在词典中共有" + (wordDict.size()) + "个实体\n");
         for (WordMark wm : wordDict.values()) {
             sb.append(wm + "\n");
         }
@@ -274,7 +284,8 @@ public class RuleDict {
                     tempRule = new Rule(value[0], value[1], value[4], Boolean.valueOf(value[2]), key);
                     if (Integer.valueOf(value[3]) * tfidf >= countMax
                             && !ruleList.contains(tempRule)
-                            && (value[4].contains("v") || value[4].contains("n"))) {
+                            && (value[4].contains("v") || value[4].contains("n"))
+                            && !value[4].equals("null")) {
                         countMax = Integer.valueOf(value[3]) * tfidf;
                         wordtemp = value;
                     }
