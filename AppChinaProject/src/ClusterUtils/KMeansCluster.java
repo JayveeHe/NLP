@@ -40,8 +40,9 @@ public class KMeansCluster {
         IClusterCalculable initTemp = kmeansDatas[(random.nextInt(kmeansDatas.length))];
 //        initTemp.setTypeID(0);
         CenterVecMap.put(0, initTemp.getVecValues());
-//        System.out.println("初始化种子点");
+        System.out.println("初始化种子点");
         for (int i = 1; i < clusterNum; i++) {//寻找最优的clusterNum个种子点
+            System.out.println("选取第个" + i + "种子");
             double distSum = 0;
             double[] minDists = new double[kmeansDatas.length];//对应每一个点，存储它与最近的种子点的距离的数组
             for (int j = 0; j < kmeansDatas.length; j++) {//对于每个点，求出它与最近的种子点的距离D(X)
@@ -65,7 +66,7 @@ public class KMeansCluster {
         }
         //进行普通的K-Means聚类
         for (int iter = 0; iter < iterNum; iter++) {
-//            System.out.println("第" + iter + "次迭代");
+            System.out.println("第" + iter + "次迭代");
             //首先进行clusterMap进行清零
             for (int t = 0; t < clusterMap.size(); t++) {
                 clusterMap.get(t).clear();
