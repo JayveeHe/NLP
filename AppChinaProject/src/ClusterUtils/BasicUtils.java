@@ -15,7 +15,7 @@ public class BasicUtils {
      * @param vec2
      * @return
      */
-    protected static double calCosDist(float[] vec1, float[] vec2) {
+    public  static double calCosDist(float[] vec1, float[] vec2) {
         double fenzi = 0;
         double fenmu1 = 0;
         double fenmu2 = 0;
@@ -61,6 +61,7 @@ public class BasicUtils {
     public static void saveResults(IClusterCalculable[][] data, String resultPath, boolean isWriteObj) throws IOException {
         File resultFile = new File(resultPath);
         FileOutputStream fos = new FileOutputStream(resultFile);
+//        fos.write("\\xEF\\xBB\\xBF".getBytes());
         for (IClusterCalculable[] typeNodes : data) {
             StringBuilder sb = new StringBuilder();
             sb.append(typeNodes[0].getTypeID());

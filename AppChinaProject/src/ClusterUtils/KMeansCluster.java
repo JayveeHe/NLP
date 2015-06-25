@@ -30,42 +30,63 @@ public class KMeansCluster {
         }
     }
 
-    public IClusterCalculable[][] kmeans(IClusterCalculable[] kmeansDatas) {
+    public IClusterCalculable[][] kmeans(IClusterCalculable[] kmeansDatas, boolean isRandomPick) {
 //        int iterNum = 50;//迭代次数
         //使用K-Means++算法进行种子点的选择
         Random random = new Random(System.currentTimeMillis());
         int dimensionNum = kmeansDatas[0].getVecValues().length;
-        //首先随机选取一个点作为种子点
-        Map<Integer, float[]> CenterVecMap = new HashMap<Integer, float[]>();//聚类中心点的map
-        IClusterCalculable initTemp = kmeansDatas[(random.nextInt(kmeansDatas.length))];
+        Map<Integer, float[]> CenterVecMap = new HashMap<Integer, float[]>();
+        ;//聚类中心点的map
+        if (!isRandomPick) {
+            //首先随机选取一个点作为种子点
+
+            IClusterCalculable initTemp = kmeansDatas[(random.nextInt(kmeansDatas.length))];
 //        initTemp.setTypeID(0);
-        CenterVecMap.put(0, initTemp.getVecValues());
-//        System.out.println("初始化种子点");
-        for (int i = 1; i < clusterNum; i++) {//寻找最优的clusterNum个种子点
-            double distSum = 0;
-            double[] minDists = new double[kmeansDatas.length];//对应每一个点，存储它与最近的种子点的距离的数组
-            for (int j = 0; j < kmeansDatas.length; j++) {//对于每个点，求出它与最近的种子点的距离D(X)
-                IClusterCalculable vecData = kmeansDatas[j];
+            CenterVecMap.put(0, initTemp.getVecValues());
+            System.out.println("初始化种子点");
+            for (int i = 1; i < clusterNum; i++) {//寻找最优的clusterNum个种子点
+                double distSum = 0;
+                double[] minDists = new double[kmeansDatas.length];//对应每一个点，存储它与最近的种子点的距离的数组
+                for (int j = 0; j < kmeansDatas.length; j++) {//对于每个点，求出它与最近的种子点的距离D(X)
+                    IClusterCalculable vecData = kmeansDatas[j];
 //                if (!CenterVecMap.contains(vecData)) {
-                minDists[j] = calMinDist(vecData, CenterVecMap);
+                    minDists[j] = calMinDist(vecData, CenterVecMap);
 //                }
-                distSum += minDists[j];
-            }
-            //取一个随机值，用权重的方式来取计算下一个种子点
-            double randomStepSum = random.nextDouble() * distSum;
-            for (int k = 0; k < kmeansDatas.length; k++) {
-                randomStepSum -= minDists[k];
-                if (randomStepSum < 0) {
-                    IClusterCalculable initSeed = kmeansDatas[k];
-                    initSeed.setTypeID(i);//设置类别标签
-                    CenterVecMap.put(i, initSeed.getVecValues());
-                    break;
+                    distSum += minDists[j];
                 }
+                //取一个随机值，用权重的方式来取计算下一个种子点
+                double randomStepSum = random.nextDouble() * distSum;
+                for (int k = 0; k < kmeansDatas.length; k++) {
+                    randomStepSum -= minDists[k];
+                    if (randomStepSum < 0) {
+                        IClusterCalculable initSeed = kmeansDatas[k];
+                        initSeed.setTypeID(i);//设置类别标签
+                        CenterVecMap.put(i, initSeed.getVecValues());
+                        break;
+                    }
+                }
+            }
+        } else {
+            int[] pickedIndex = new int[clusterNum];
+            for (int i = 0; i < clusterNum; i++) {
+                boolean isPicked = false;
+                int index;
+                do {
+                    index = random.nextInt(kmeansDatas.length);
+                    isPicked = false;
+                    for (int tmp_index : pickedIndex) {
+                        if (index == tmp_index) {
+                            isPicked = true;
+                            break;
+                        }
+                    }
+                } while (isPicked);
+                CenterVecMap.put(i, kmeansDatas[(index)].getVecValues());
             }
         }
         //进行普通的K-Means聚类
         for (int iter = 0; iter < iterNum; iter++) {
-//            System.out.println("第" + iter + "次迭代");
+            System.out.println("第" + iter + "次迭代");
             //首先进行clusterMap进行清零
             for (int t = 0; t < clusterMap.size(); t++) {
                 clusterMap.get(t).clear();
