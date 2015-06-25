@@ -30,12 +30,13 @@ public class AppNode implements IClusterCalculable<String> {
      * @param namefilepath
      * @return
      */
-    public static AppNode[] getAppNodesByFile(String datafilepath, String namefilepath) {
+    public static AppNode[] getAppNodesByFile(String datafilepath, String namefilepath,String metavecpath) {
         String data_str = FileUtils.File2str(datafilepath, "utf-8");
         String[] dataline = data_str.split("\n");
         String name_str = FileUtils.File2str(namefilepath, "utf-8");
         String[] nameline = name_str.split("\n");
-        Map<String, Integer> metaVecMap = AnalysisAppIntro.getMetaVecMap("AppChinaProject/data/vecWords.txt");
+//        Map<String, Integer> metaVecMap = AnalysisAppIntro.getMetaVecMap("AppChinaProject/data/vecWords.txt");
+        Map<String, Integer> metaVecMap = AnalysisAppIntro.getMetaVecMap(metavecpath);
         int vecLen = metaVecMap.get("indexCount");
         AppNode[] nodes = new AppNode[dataline.length];
         for (int i = 0; i < dataline.length; i++) {//

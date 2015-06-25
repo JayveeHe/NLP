@@ -12,11 +12,11 @@ import java.util.Map;
 public class APCluster {
     private int dNum = 0;//矩阵维数
     private IClusterCalculable[] oriDatas;
-    private double[][] Smatrix;
-    private double[][] Amatrix;
-    private double[][] Rmatrix;
+    private float[][] Smatrix;
+    private float[][] Amatrix;
+    private float[][] Rmatrix;
     private int[] Tmatrix;
-    private double pk;
+    private float pk;
     private float lam;
     private int iterNum;
     private float coePK;
@@ -40,9 +40,10 @@ public class APCluster {
     public APCluster(IClusterCalculable[] oriDatas, int iterNum, float lam, float coePK) {
         this.oriDatas = oriDatas;
         this.dNum = oriDatas.length;
-        this.Amatrix = new double[dNum][dNum];//all zero
-        this.Rmatrix = new double[dNum][dNum];
+        this.Amatrix = new float[dNum][dNum];//all zero
+        this.Rmatrix = new float[dNum][dNum];
         this.Tmatrix = new int[dNum];
+        this.Smatrix = getSimilarMatrix(oriDatas);
         this.iterNum = iterNum;
         this.lam = lam;
         this.coePK = coePK;
@@ -53,17 +54,17 @@ public class APCluster {
         return getResult();
     }
 
-    private double[][] getSimilarMatrix(IClusterCalculable[] oriData) {
-        double[][] S = new double[dNum][dNum];//相似矩阵
-        ArrayList<Double> list_S = new ArrayList<Double>();
-//        double sum = 0;
+    private float[][] getSimilarMatrix(IClusterCalculable[] oriData) {
+        float[][] S = new float[dNum][dNum];//相似矩阵
+        ArrayList<Float> list_S = new ArrayList<Float>();
+//        float sum = 0;
         for (int i = 0; i < dNum; i++) {
             IClusterCalculable data_i = oriData[i];
             for (int j = 0; j < dNum; j++) {
                 if (i != j) {
                     IClusterCalculable data_j = oriData[j];
                     //使用欧氏距离还是余弦距离，此处有待斟酌。注意，欧氏距离时，此处应该为负值
-                    S[i][j] = -BasicUtils.calDist(data_i.getVecValues(), data_j.getVecValues());
+                    S[i][j] = (float) -BasicUtils.calDist(data_i.getVecValues(), data_j.getVecValues());
                     list_S.add(S[i][j]);
 //                    sum += S[i][j];
                 }
@@ -85,13 +86,13 @@ public class APCluster {
     }
 
 
-    private double[][] calResponsibility(double[][] smatrix, double[][] amatrix) {
-        double[][] rmatrix = new double[dNum][dNum];
+    private float[][] calResponsibility(float[][] smatrix, float[][] amatrix) {
+        float[][] rmatrix = new float[dNum][dNum];
         for (int i = 0; i < dNum; i++) {
             for (int k = 0; k < dNum; k++) {
                 //计算 max{A(i,j)+S(i,j)}
-                double maxAS = -Double.MAX_VALUE;
-                double temp;
+                float maxAS = -Float.MAX_VALUE;
+                float temp;
                 for (int j = 0; j < dNum; j++) {
                     if (j != k) {
                         temp = amatrix[i][j] + smatrix[i][j];
@@ -114,18 +115,18 @@ public class APCluster {
         return rmatrix;
     }
 
-    private double[][] calAvailability(double[][] rmatrix) {
-        double[][] amatrix = new double[dNum][dNum];
+    private float[][] calAvailability(float[][] rmatrix) {
+        float[][] amatrix = new float[dNum][dNum];
         for (int i = 0; i < dNum; i++) {
             for (int k = 0; k < dNum; k++) {
                 //首先计算max(0,R(j,k))对于j的求和，其中j!=i且j!=k
-                double maxSum = 0;
+                float maxSum = 0;
                 for (int j = 0; j < dNum; j++) {
                     if (j != i && j != k) {
                         maxSum += 0 > rmatrix[j][k] ? 0 : rmatrix[j][k];
                     }
                 }
-                double temp = rmatrix[k][k] + maxSum;
+                float temp = rmatrix[k][k] + maxSum;
                 if (i != k) {
                     amatrix[i][k] = 0 < temp ? 0 : temp;
                 } else {
@@ -143,7 +144,7 @@ public class APCluster {
      *
      * @param lam 阻尼系数，0.5到1之间
      */
-    private void calDumping(float lam, double[][] rmatrix, double[][] amatrix) {
+    private void calDumping(float lam, float[][] rmatrix, float[][] amatrix) {
         for (int i = 0; i < dNum; i++) {
             for (int k = 0; k < dNum; k++) {
                 rmatrix[i][k] = (1 - lam) * rmatrix[i][k] + lam * Rmatrix[i][k];
@@ -159,12 +160,12 @@ public class APCluster {
      * @param amatrix
      * @return typeMatrix 包含类别的一维数组
      */
-    private int[] identifyCluster(double[][] rmatrix, double[][] amatrix) {
+    private int[] identifyCluster(float[][] rmatrix, float[][] amatrix) {
         int[] typeMatrix = new int[dNum];
         for (int i = 0; i < dNum; i++) {
-            double max = -Double.MAX_VALUE;
+            float max = -Float.MAX_VALUE;
             for (int k = 0; k < dNum; k++) {
-                double temp = amatrix[i][k] + rmatrix[i][k];
+                float temp = amatrix[i][k] + rmatrix[i][k];
                 if (temp > max) {
                     max = temp;
                     typeMatrix[i] = k;
@@ -175,15 +176,15 @@ public class APCluster {
     }
 
     protected int[] clusterIter(int iterNum) {
-        Smatrix = getSimilarMatrix(oriDatas);
+//        Smatrix = getSimilarMatrix(oriDatas);
         int diffCount = 0;//中心点不变化的次数
         for (int i = 0; i < iterNum; i++) {
             int diffNum = 0;//在一次迭代中中心点变化的个数
             System.out.println("正在进行第" + i + "次迭代");
             //注意，先更新R再更新A
             //TODO 更新时是否需要使用最新的数据，待斟酌
-            double[][] rmatrix = calResponsibility(Smatrix, Amatrix);
-            double[][] amatrix = calAvailability(Rmatrix);
+            float[][] rmatrix = calResponsibility(Smatrix, Amatrix);
+            float[][] amatrix = calAvailability(Rmatrix);
             //收敛处理
             calDumping(lam, rmatrix, amatrix);
             Rmatrix = rmatrix;
@@ -208,6 +209,39 @@ public class APCluster {
     }
 
     public IClusterCalculable[][] getResult() {
+        //根据Tmatrix来输出结果
+        HashMap<Integer, ArrayList<IClusterCalculable>> clusterMap = new HashMap<Integer, ArrayList<IClusterCalculable>>();
+        for (int i = 0; i < dNum; i++) {
+            IClusterCalculable data = oriDatas[i];
+            data.setTypeID(Tmatrix[i]);
+            if (clusterMap.containsKey(Tmatrix[i])) {
+                ArrayList<IClusterCalculable> list = clusterMap.get(Tmatrix[i]);
+                list.add(data);
+
+            } else {
+                ArrayList<IClusterCalculable> newlist = new ArrayList<IClusterCalculable>();
+                newlist.add(data);
+                clusterMap.put(Tmatrix[i], newlist);
+            }
+        }
+//        Collections.sort(oriDatas, BasicUtils.typeSorter);
+        IClusterCalculable[][] result = new IClusterCalculable[clusterMap.size()][];
+        int count = 0;
+        for (Map.Entry<Integer, ArrayList<IClusterCalculable>> entry : clusterMap.entrySet()) {
+            ArrayList<IClusterCalculable> arrayList = entry.getValue();
+            IClusterCalculable[] array = new IClusterCalculable[arrayList.size()];
+            for (int i = 0; i < array.length; i++) {
+                array[i] = arrayList.get(i);
+            }
+            result[count] = array;
+            count++;
+        }
+        return result;
+    }
+
+
+
+    public IClusterCalculable[][] getResult(IClusterCalculable[] oriDatas) {
         //根据Tmatrix来输出结果
         HashMap<Integer, ArrayList<IClusterCalculable>> clusterMap = new HashMap<Integer, ArrayList<IClusterCalculable>>();
         for (int i = 0; i < dNum; i++) {
